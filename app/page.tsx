@@ -36,7 +36,7 @@ export default function Home() {
 
         // Get exchange rate for current currency
         const exchangeRate =
-          currency.code === "USD" ? 1 : exchangeRates[currency.code]
+          currency.code === "USD" ? 1 : exchangeRates?.[currency.code] ?? 1
 
         // Fetch with currency and exchange rate parameters
         const response = await fetch(
