@@ -137,14 +137,14 @@ async function fetchHistoricalData(
     throw new Error("Invalid historical data response")
   }
 
-  // Transform API response to our format
-  const historicalData: HistoricalDataPoint[] = Object.entries(data.rates).map(
-    ([date, rates]: [string, { XAU: number; XAG: number }]) => ({
-      date,
-      goldPrice: Number((1 / rates.XAU / TROY_OUNCE_TO_GRAMS).toFixed(4)), // USD per gram
-      silverPrice: Number((1 / rates.XAG / TROY_OUNCE_TO_GRAMS).toFixed(4)),
-    })
-  )
+  // Transform API response to our format with proper typing
+  const historicalData: HistoricalDataPoint[] = Object.entries(
+    data.rates as Record<string, { XAU: number; XAG: number }>
+  ).map(([date, rates]) => ({
+    date,
+    goldPrice: Number((1 / rates.XAU / TROY_OUNCE_TO_GRAMS).toFixed(4)), // USD per gram
+    silverPrice: Number((1 / rates.XAG / TROY_OUNCE_TO_GRAMS).toFixed(4)),
+  }))
 
   // Sort by date ascending
   return historicalData.sort(
