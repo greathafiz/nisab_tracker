@@ -1,103 +1,194 @@
-import Image from "next/image";
+"use client"
+import { useEffect, useState } from "react"
+import { useCurrencyDate } from "@/contexts/CurrencyDateContext"
+import { Button } from "@/components/ui/shadcn/button"
+import { NisabCard } from "@/components/homepage/NisabCard"
+import { HeroSection } from "@/components/homepage/HeroSection"
+import { ZakatSection } from "@/components/homepage/ZakatSection"
+import { Footer } from "@/components/ui/Footer"
+// import { HistoricalChart } from "@/components/homepage/HistoricalChart"
+// import { Separator } from "@/components/ui/shadcn/separator"
+
+interface NisabData {
+  nisabGold: string
+  nisabSilver: string
+  dowry: string
+  diyyah: string
+  currency: string
+  lastUpdated: string
+  goldPriceChange: string
+  silverPriceChange: string
+}
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const { currency, exchangeRates, isLoadingRates } = useCurrencyDate()
+  const [nisabData, setNisabData] = useState<NisabData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    if (isLoadingRates) return
+
+    async function fetchNisabData() {
+      try {
+        setIsLoading(true)
+        setError(null)
+
+        // Get exchange rate for current currency
+        const exchangeRate =
+          currency.code === "USD" ? 1 : exchangeRates[currency.code]
+
+        // Fetch with currency and exchange rate parameters
+        const response = await fetch(
+          `/api/nisab?currency=${currency.code}&rate=${exchangeRate}`
+        )
+        if (!response.ok) {
+          throw new Error("Failed to fetch Nisab data")
+        }
+        const data = await response.json()
+
+        const formattedData: NisabData = {
+          nisabGold: data.nisabGold.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+          nisabSilver: data.nisabSilver.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+          dowry: data.dowry.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+          diyyah: data.diyyah.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+          currency: currency.code,
+          lastUpdated: new Date(data.lastUpdated).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          goldPriceChange: `${
+            data.goldPriceChange >= 0 ? "+" : ""
+          }${data.goldPriceChange.toFixed(1)}%`,
+          silverPriceChange: `${
+            data.silverPriceChange >= 0 ? "+" : ""
+          }${data.silverPriceChange.toFixed(1)}%`,
+        }
+
+        setNisabData(formattedData)
+        setError(null)
+      } catch (err) {
+        console.error("Error fetching Nisab data:", err)
+        setError("Failed to load current data. Please try again.")
+        setNisabData(null)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchNisabData()
+  }, [currency, exchangeRates, isLoadingRates])
+
+  if (error && !nisabData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
+            <span className="text-white font-bold text-xl">!</span>
+          </div>
+          <p className="text-red-600 font-medium mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Try Again
+          </Button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      </div>
+    )
+  }
+
+  const data = nisabData || {
+    nisabGold: "",
+    nisabSilver: "",
+    dowry: "",
+    diyyah: "",
+    currency: currency.code,
+    lastUpdated: "",
+    goldPriceChange: "",
+    silverPriceChange: "",
+  }
+
+  return (
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <HeroSection lastUpdated={data.lastUpdated} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+        <NisabCard
+          title="Nisab (Gold)"
+          value={data.nisabGold}
+          currency={data.currency}
+          description="87.48 grams of gold"
+          lastUpdated={data.lastUpdated}
+          featured={true}
+          change={data.goldPriceChange}
+          icon="🥇"
+          isLoading={isLoading}
+        />
+        <NisabCard
+          title="Nisab (Silver)"
+          value={data.nisabSilver}
+          currency={data.currency}
+          description="612.36 grams of silver"
+          lastUpdated={data.lastUpdated}
+          featured={true}
+          change={data.silverPriceChange}
+          icon="🥈"
+          isLoading={isLoading}
+        />
+      </div>
+
+      {/* <Separator className="my-12" />
+
+      <div className="mb-16">
+        <HistoricalChart currency={data.currency} />
+      </div>
+
+      <Separator className="my-12" /> */}
+
+      <div className="mb-16">
+        <h3 className="text-2xl font-bold text-stone-900 mb-2 text-center">
+          Other Islamic Financial Values
+        </h3>
+        <p className="text-stone-600 text-center mb-8">
+          Additional important thresholds in Islamic jurisprudence
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <NisabCard
+            title="Mahr al-Fatimah"
+            value={data.dowry}
+            currency={data.currency}
+            description="Reference dowry amount"
+            lastUpdated={data.lastUpdated}
+            icon="💍"
+            isLoading={isLoading}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+          <NisabCard
+            title="Diyyah"
+            value={data.diyyah}
+            currency={data.currency}
+            description="Blood money compensation"
+            lastUpdated={data.lastUpdated}
+            icon="⚖️"
+            isLoading={isLoading}
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+        </div>
+      </div>
+
+      <ZakatSection />
+
+      <Footer />
+    </main>
+  )
 }
