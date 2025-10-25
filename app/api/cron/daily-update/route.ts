@@ -1,5 +1,5 @@
 import { updateMetalsPriceCache } from "@/lib/redis/metals-cache"
-import { updateHistoricalPricesCache } from "@/lib/redis/historical-cache"
+// import { updateHistoricalPricesCache } from "@/lib/redis/historical-cache"
 import { updateExchangeRatesCache } from "@/lib/redis/exchange-rates-cache"
 import { NextResponse } from "next/server"
 
