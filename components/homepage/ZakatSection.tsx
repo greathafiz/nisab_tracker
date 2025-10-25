@@ -36,7 +36,8 @@ export const ZakatSection = () => {
           </a>
         </div>
         <p className="text-emerald-200 text-sm mt-6">
-          ✓ Free forever ✓ Privacy focused ✓ Scholarly approved
+          ✓ Free forever ✓ Privacy focused
+          {/* ✓ Scholarly approved */}
         </p>
       </div>
     </div>
