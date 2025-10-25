@@ -4,6 +4,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useMemo,
   ReactNode,
 } from "react"
 
@@ -192,6 +193,15 @@ export function CurrencyDateProvider({ children }: { children: ReactNode }) {
   > | null>({})
   const [isLoadingRates, setIsLoadingRates] = useState(true)
 
+  // ✅ Stabilize exchangeRates with useMemo to prevent unnecessary re-renders
+  // Using a serialized key to detect actual content changes
+  const exchangeRatesKey = exchangeRates ? JSON.stringify(exchangeRates) : null
+  const stableExchangeRates = useMemo(
+    () => exchangeRates,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [exchangeRatesKey]
+  )
+
   useEffect(() => {
     async function loadExchangeRates() {
       setIsLoadingRates(true)
@@ -215,8 +225,8 @@ export function CurrencyDateProvider({ children }: { children: ReactNode }) {
     const targetCurrency = toCurrency || currencyCode
     if (targetCurrency === "USD") return amount
 
-    if (!exchangeRates) return amount // Return original if rates not loaded
-    const rate = exchangeRates[targetCurrency]
+    if (!stableExchangeRates) return amount // Return original if rates not loaded
+    const rate = stableExchangeRates[targetCurrency]
     if (!rate) return amount // Return original if no rate available
 
     return amount * rate
@@ -252,7 +262,7 @@ export function CurrencyDateProvider({ children }: { children: ReactNode }) {
     hijriDate,
     gregorianDate,
     refreshDates,
-    exchangeRates,
+    exchangeRates: stableExchangeRates,
     convertFromUSD,
     isLoadingRates,
   }

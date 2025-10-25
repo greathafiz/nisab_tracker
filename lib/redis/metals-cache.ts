@@ -1,4 +1,4 @@
-import { kv } from "@vercel/kv"
+import { redis } from "./redis-config"
 
 export interface MetalsPriceCache {
   goldPricePerGram: number
@@ -57,7 +57,7 @@ export async function updateMetalsPriceCache(): Promise<MetalsPriceCache> {
 
   console.error("❌ All APIs failed, using static fallback")
   const fallback = getStaticFallback()
-  await kv.set(METALS_CACHE_KEY, fallback)
+  await redis.set(METALS_CACHE_KEY, fallback)
   return fallback
 }
 
@@ -66,7 +66,7 @@ export async function updateMetalsPriceCache(): Promise<MetalsPriceCache> {
  */
 export async function getCachedMetalsPrices(): Promise<MetalsPriceCache | null> {
   try {
-    const cached = await kv.get<MetalsPriceCache>(METALS_CACHE_KEY)
+    const cached = await redis.get<MetalsPriceCache>(METALS_CACHE_KEY)
 
     if (!cached) {
       console.log("💾 No cache found in Redis, fetching fresh data...")
@@ -93,7 +93,7 @@ export async function getCachedMetalsPrices(): Promise<MetalsPriceCache | null> 
  * Save to Redis and update historical prices for change calculation
  */
 async function saveToCacheWithHistory(cache: MetalsPriceCache): Promise<void> {
-  const previousPrices = await kv.get<PreviousDayPrices>(PREVIOUS_PRICES_KEY)
+  const previousPrices = await redis.get<PreviousDayPrices>(PREVIOUS_PRICES_KEY)
 
   if (previousPrices) {
     cache.goldPriceChange = calculatePriceChange(
@@ -106,14 +106,14 @@ async function saveToCacheWithHistory(cache: MetalsPriceCache): Promise<void> {
     )
   }
 
-  await kv.set(METALS_CACHE_KEY, cache)
+  await redis.set(METALS_CACHE_KEY, cache)
 
   const newPreviousPrices: PreviousDayPrices = {
     gold: cache.goldPricePerGram,
     silver: cache.silverPricePerGram,
     date: new Date().toISOString(),
   }
-  await kv.set(PREVIOUS_PRICES_KEY, newPreviousPrices)
+  await redis.set(PREVIOUS_PRICES_KEY, newPreviousPrices)
 
   console.log("✅ Metals prices cached in Redis")
 }
@@ -156,7 +156,9 @@ async function fetchFromMetalPriceAPI(): Promise<MetalsPriceCache | null> {
       silverPricePerGram: Number(silverPricePerGram.toFixed(4)),
       goldPriceChange: 0, // Will be calculated when saving
       silverPriceChange: 0,
-      lastUpdated: new Date().toISOString(),
+      lastUpdated:
+        new Date(data.timestamp * 1000).toISOString() ||
+        new Date().toISOString(),
       source: "metalpriceapi",
     }
   } catch (error) {
@@ -202,7 +204,10 @@ async function fetchFromGoldPriceIO(): Promise<MetalsPriceCache | null> {
       silverPricePerGram: Number(silverData.price_gram_24k.toFixed(4)),
       goldPriceChange: 0,
       silverPriceChange: 0,
-      lastUpdated: new Date().toISOString(),
+      lastUpdated:
+        new Date(goldData.timestamp * 1000).toISOString() ||
+        new Date(silverData.timestamp * 1000).toISOString() ||
+        new Date().toISOString(),
       source: "goldpriceio",
     }
   } catch (error) {

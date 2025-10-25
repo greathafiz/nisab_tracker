@@ -10,10 +10,14 @@ interface NisabValues {
   lastUpdated: string
   goldPriceChange: number
   silverPriceChange: number
+  goldPricePerGram: number
+  silverPricePerGram: number
 }
 
 const GOLD_NISAB_GRAMS = 87.48
 const SILVER_NISAB_GRAMS = 612.36
+const MAHR_AL_FATIMAH_GRAMS = 1487.5 // 500 dirhams × 2.975g
+const DIYYAH_GOLD_GRAMS = 4374 // Approximately 1000 dinars
 
 export async function GET(request: Request) {
   try {
@@ -25,7 +29,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(nisabData, {
       headers: {
-        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200", // ✅ 1 hour cache, 2 hours stale
       },
     })
   } catch (error) {
@@ -54,8 +58,8 @@ export async function getNisabValues(
 
     const nisabGoldUSD = priceCache.goldPricePerGram * GOLD_NISAB_GRAMS
     const nisabSilverUSD = priceCache.silverPricePerGram * SILVER_NISAB_GRAMS
-    const dowryUSD = nisabSilverUSD * 0.5
-    const diyyahUSD = nisabGoldUSD * 50
+    const dowryUSD = priceCache.silverPricePerGram * MAHR_AL_FATIMAH_GRAMS
+    const diyyahUSD = priceCache.goldPricePerGram * DIYYAH_GOLD_GRAMS
 
     const nisabGold =
       currency === "USD" ? nisabGoldUSD : nisabGoldUSD * exchangeRate
@@ -73,6 +77,14 @@ export async function getNisabValues(
       lastUpdated: priceCache.lastUpdated,
       goldPriceChange: priceCache.goldPriceChange,
       silverPriceChange: priceCache.silverPriceChange,
+      goldPricePerGram:
+        currency === "USD"
+          ? priceCache.goldPricePerGram
+          : Number((priceCache.goldPricePerGram * exchangeRate).toFixed(2)),
+      silverPricePerGram:
+        currency === "USD"
+          ? priceCache.silverPricePerGram
+          : Number((priceCache.silverPricePerGram * exchangeRate).toFixed(2)),
     }
   } catch (error) {
     console.error("Error calculating Nisab values:", error)

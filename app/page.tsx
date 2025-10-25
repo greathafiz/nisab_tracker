@@ -18,6 +18,8 @@ interface NisabData {
   lastUpdated: string
   goldPriceChange: string
   silverPriceChange: string
+  goldPricePerGram: number
+  silverPricePerGram: number
 }
 
 export default function Home() {
@@ -77,6 +79,8 @@ export default function Home() {
           silverPriceChange: `${
             data.silverPriceChange >= 0 ? "+" : ""
           }${data.silverPriceChange.toFixed(1)}%`,
+          goldPricePerGram: data.goldPricePerGram || 0,
+          silverPricePerGram: data.silverPricePerGram || 0,
         }
 
         setNisabData(formattedData)
@@ -91,7 +95,8 @@ export default function Home() {
     }
 
     fetchNisabData()
-  }, [currency, exchangeRates, isLoadingRates])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currency.code, isLoadingRates]) // ✅ Only depend on currency.code, not entire objects
 
   if (error && !nisabData) {
     return (
@@ -118,11 +123,19 @@ export default function Home() {
     lastUpdated: "",
     goldPriceChange: "",
     silverPriceChange: "",
+    goldPricePerGram: 0,
+    silverPricePerGram: 0,
   }
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <HeroSection lastUpdated={data.lastUpdated} />
+      <HeroSection
+        lastUpdated={data.lastUpdated}
+        goldPricePerGram={data.goldPricePerGram}
+        silverPricePerGram={data.silverPricePerGram}
+        currency={data.currency}
+        isLoading={isLoading}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
         <NisabCard
@@ -157,7 +170,7 @@ export default function Home() {
 
       <Separator className="my-12" /> */}
 
-      <div className="mb-16">
+      {/* <div className="mb-16">
         <h3 className="text-2xl font-bold text-stone-900 mb-2 text-center">
           Other Islamic Financial Values
         </h3>
@@ -169,7 +182,7 @@ export default function Home() {
             title="Mahr al-Fatimah"
             value={data.dowry}
             currency={data.currency}
-            description="Reference dowry amount"
+            description="1,487.5 grams of silver"
             lastUpdated={data.lastUpdated}
             icon="💍"
             isLoading={isLoading}
@@ -178,13 +191,56 @@ export default function Home() {
             title="Diyyah"
             value={data.diyyah}
             currency={data.currency}
-            description="Blood money compensation"
+            description="4,374 grams of gold"
             lastUpdated={data.lastUpdated}
             icon="⚖️"
             isLoading={isLoading}
           />
         </div>
-      </div>
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-5 border border-purple-100">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-lg">💍</span>
+              </div>
+              <div>
+                <h4 className="font-semibold text-stone-900 mb-2 text-sm">
+                  About Mahr al-Fatimah
+                </h4>
+                <p className="text-xs text-stone-700 leading-relaxed">
+                  The reference dowry amount based on what Prophet Muhammad ﷺ
+                  gave to his daughter Fatimah رضي الله عنها (500 dirhams =
+                  1,487.5g of silver). This is the minimum amount recommended
+                  for Mahr (dowry) in marriage. It is also the minimum amount to
+                  be stolen before the Hadd (Islamic punishment) is applied to a
+                  thief.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-5 border border-amber-100">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-lg">⚖️</span>
+              </div>
+              <div>
+                <h4 className="font-semibold text-stone-900 mb-2 text-sm">
+                  About Diyyah (Blood Money)
+                </h4>
+                <p className="text-xs text-stone-700 leading-relaxed">
+                  The financial compensation to be paid to the family of a
+                  person who was killed accidentally or unintentionally.
+                  Traditionally set at 1,000 dinars or 12,000 dirhams (approx.
+                  4,374g of gold). This serves as a means of reconciliation and
+                  support for the victim&apos;s family in Islamic law.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> */}
 
       <ZakatSection />
 

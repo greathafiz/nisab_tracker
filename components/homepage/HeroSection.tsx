@@ -1,8 +1,18 @@
 interface HeroSectionProps {
   lastUpdated: string
+  goldPricePerGram?: number
+  silverPricePerGram?: number
+  currency?: string
+  isLoading?: boolean
 }
 
-export const HeroSection = ({ lastUpdated }: HeroSectionProps) => {
+export const HeroSection = ({
+  lastUpdated,
+  goldPricePerGram,
+  silverPricePerGram,
+  currency,
+  isLoading = false,
+}: HeroSectionProps) => {
   return (
     <div className="text-center mb-16">
       {lastUpdated && (
@@ -11,9 +21,39 @@ export const HeroSection = ({ lastUpdated }: HeroSectionProps) => {
           <span>Live Data • Updated {lastUpdated}</span>
         </div>
       )}
+
+      {/* Current spot prices - small and subtle */}
+      {goldPricePerGram && silverPricePerGram && currency && (
+        <div className="mb-4">
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-4 text-xs text-stone-500">
+              <div className="h-3 w-24 bg-stone-200 rounded animate-pulse"></div>
+              <div className="h-3 w-24 bg-stone-200 rounded animate-pulse"></div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-6 text-xs text-stone-600">
+              <div className="flex items-center gap-1.5">
+                <span className="text-amber-500">🥇</span>
+                <span className="font-medium">
+                  {currency} {goldPricePerGram.toLocaleString()}/g
+                </span>
+              </div>
+              <div className="w-px h-4 bg-stone-300"></div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-stone-400">🥈</span>
+                <span className="font-medium">
+                  {currency} {silverPricePerGram.toLocaleString()}/g
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="text-center mb-4">
         <p className="text-xs text-stone-500 max-w-xl mx-auto">
-          Based on global gold & silver rates from London Metal Exchange & COMEX
+          Based on international spot prices from trusted precious metals data
+          providers
           <span className="mx-2">•</span>
           Data refreshed every day for accuracy
         </p>

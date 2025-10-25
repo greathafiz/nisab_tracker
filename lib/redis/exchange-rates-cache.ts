@@ -1,4 +1,4 @@
-import { kv } from "@vercel/kv"
+import { redis } from "./redis-config"
 
 export interface ExchangeRatesCache {
   rates: Record<string, number>
@@ -6,7 +6,6 @@ export interface ExchangeRatesCache {
   source: "exchangerate-api" | "frankfurter" | "fallback"
 }
 
-// Redis key
 const EXCHANGE_RATES_KEY = "exchange:rates"
 
 /**
@@ -14,7 +13,7 @@ const EXCHANGE_RATES_KEY = "exchange:rates"
  */
 export async function updateExchangeRatesCache(): Promise<ExchangeRatesCache | null> {
   const primaryResult = await fetchFromExchangeRateAPI()
-  await kv.set(EXCHANGE_RATES_KEY, primaryResult)
+  await redis.set(EXCHANGE_RATES_KEY, primaryResult)
   console.log("✅ Exchange rates cached in Redis")
   return primaryResult
 }
@@ -24,7 +23,7 @@ export async function updateExchangeRatesCache(): Promise<ExchangeRatesCache | n
  */
 export async function getCachedExchangeRates(): Promise<ExchangeRatesCache | null> {
   try {
-    const cached = await kv.get<ExchangeRatesCache>(EXCHANGE_RATES_KEY)
+    const cached = await redis.get<ExchangeRatesCache>(EXCHANGE_RATES_KEY)
 
     if (!cached) {
       console.log("No exchange rates cache found, fetching...")
@@ -62,7 +61,7 @@ async function fetchFromExchangeRateAPI(): Promise<ExchangeRatesCache | null> {
 
     return {
       rates: data.conversion_rates || {},
-      lastUpdated: data.time_last_update_unix.toISOString(),
+      lastUpdated: new Date(data.time_last_update_unix * 1000).toISOString(),
       source: "exchangerate-api",
     }
   } catch (error) {
