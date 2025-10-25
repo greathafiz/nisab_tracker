@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import { useCurrencyDate } from "@/contexts/CurrencyDateContext"
+import { formatLastUpdated } from "@/lib/format-time"
 import { Button } from "@/components/ui/shadcn/button"
 import { NisabCard } from "@/components/homepage/NisabCard"
 import { HeroSection } from "@/components/homepage/HeroSection"
@@ -67,12 +68,7 @@ export default function Home() {
             maximumFractionDigits: 2,
           }),
           currency: currency.code,
-          lastUpdated: new Date(data.lastUpdated).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+          lastUpdated: formatLastUpdated(data.lastUpdated),
           goldPriceChange: `${
             data.goldPriceChange >= 0 ? "+" : ""
           }${data.goldPriceChange.toFixed(1)}%`,
