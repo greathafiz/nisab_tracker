@@ -1,28 +1,28 @@
-import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
-import "./globals.css"
-import { CurrencyDateProvider } from "@/contexts/CurrencyDateContext"
-import { Header } from "@/components/ui/Header"
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import { CurrencyDateProvider } from "@/contexts/CurrencyDateContext";
+import { Header } from "@/components/layouts/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-})
+});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-})
+});
 
 export const metadata: Metadata = {
   title: "Nisab Tracker",
   description: "Nisab Tracker and Zakat Calculator",
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en">
@@ -37,5 +37,5 @@ export default function RootLayout({
         </CurrencyDateProvider>
       </body>
     </html>
-  )
+  );
 }

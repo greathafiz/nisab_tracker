@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   AreaChart,
@@ -9,77 +9,77 @@ import {
   ResponsiveContainer,
   Legend,
   Tooltip,
-} from "recharts"
+} from "recharts";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/shadcn/card"
-import { Button } from "@/components/ui/shadcn/button"
-import { Badge } from "@/components/ui/shadcn/badge"
-import { useState, useEffect } from "react"
-import { useCurrencyDate } from "@/contexts/CurrencyDateContext"
+} from "@/components/ui/shadcn/card";
+import { Button } from "@/components/ui/shadcn/button";
+import { Badge } from "@/components/ui/shadcn/badge";
+import { useState, useEffect } from "react";
+import { useCurrencyDate } from "@/contexts/CurrencyDateContext";
 
 interface HistoricalChartProps {
-  currency: string
+  currency: string;
 }
 
 interface ChartDataPoint {
-  date: string
-  goldNisab: number
-  silverNisab: number
+  date: string;
+  goldNisab: number;
+  silverNisab: number;
 }
 
 export function HistoricalChart({ currency }: HistoricalChartProps) {
-  const { exchangeRates, isLoadingRates } = useCurrencyDate()
-  const [timeframe, setTimeframe] = useState<"7d" | "30d">("7d")
-  const [data, setData] = useState<ChartDataPoint[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { exchangeRates, isLoadingRates } = useCurrencyDate();
+  const [timeframe, setTimeframe] = useState<"7d" | "30d">("7d");
+  const [data, setData] = useState<ChartDataPoint[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isLoadingRates) return
+    if (isLoadingRates) return;
 
     async function fetchHistoricalData() {
       try {
-        setIsLoading(true)
-        setError(null)
+        setIsLoading(true);
+        setError(null);
 
         const exchangeRate =
-          currency === "USD" ? 1 : exchangeRates?.[currency] ?? 1
+          currency === "USD" ? 1 : (exchangeRates?.[currency] ?? 1);
 
         const response = await fetch(
           `/api/historical?timeframe=${timeframe}&currency=${currency}&rate=${exchangeRate}`
-        )
+        );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch historical data")
+          throw new Error("Failed to fetch historical data");
         }
 
-        const result = await response.json()
-        setData(result.data || [])
+        const result = await response.json();
+        setData(result.data || []);
       } catch (err) {
-        console.error("Error fetching historical data:", err)
-        setError("Failed to load chart data")
-        setData([])
+        console.error("Error fetching historical data:", err);
+        setError("Failed to load chart data");
+        setData([]);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchHistoricalData()
+    fetchHistoricalData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timeframe, currency, isLoadingRates]) // ✅ Removed exchangeRates from deps
+  }, [timeframe, currency, isLoadingRates]);
 
   const CustomTooltip = ({
     active,
     payload,
     label,
   }: {
-    active?: boolean
-    payload?: Array<{ name: string; value: number; color: string }>
-    label?: string
+    active?: boolean;
+    payload?: Array<{ name: string; value: number; color: string }>;
+    label?: string;
   }) => {
     if (active && payload && payload.length) {
       return (
@@ -91,10 +91,10 @@ export function HistoricalChart({ currency }: HistoricalChartProps) {
             </p>
           ))}
         </div>
-      )
+      );
     }
-    return null
-  }
+    return null;
+  };
 
   return (
     <Card className="border-stone-200 bg-white shadow-sm">
@@ -242,5 +242,5 @@ export function HistoricalChart({ currency }: HistoricalChartProps) {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

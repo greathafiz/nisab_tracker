@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Badge } from "./shadcn/badge"
-import { Button } from "./shadcn/button"
+import React from "react";
+import { Badge } from "../ui/shadcn/badge";
+import { Button } from "../ui/shadcn/button";
 import {
   useCurrencyDate,
   currencies,
   type CurrencyCode,
-} from "../../contexts/CurrencyDateContext"
-import Link from "next/link"
+} from "../../contexts/CurrencyDateContext";
+import Link from "next/link";
 
 export const Header = () => {
-  const { currency, setCurrency, hijriDate, gregorianDate } = useCurrencyDate()
+  const { currency, setCurrency, hijriDate, gregorianDate } = useCurrencyDate();
 
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCurrency(e.target.value as CurrencyCode)
-  }
+    setCurrency(e.target.value as CurrencyCode);
+  };
 
   return (
     <header className="border-b border-stone-200/80 bg-white/95 backdrop-blur-md sticky top-0 z-50">
@@ -71,5 +71,5 @@ export const Header = () => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};

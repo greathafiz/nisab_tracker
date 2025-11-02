@@ -1,6 +1,6 @@
-import React from "react"
-import { Separator } from "./shadcn/separator"
-import Link from "next/link"
+import React from "react";
+import { Separator } from "../ui/shadcn/separator";
+import Link from "next/link";
 
 export const Footer = () => {
   return (
@@ -85,5 +85,5 @@ export const Footer = () => {
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};

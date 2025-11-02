@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, {
   createContext,
   useContext,
@@ -6,7 +6,21 @@ import React, {
   useEffect,
   useMemo,
   ReactNode,
-} from "react"
+} from "react";
+
+/**
+ * Currency & Date Context
+ *
+ * Provides:
+ * - Multi-currency support (20+ currencies)
+ * - Auto-detection based on browser locale e.g. en-GB, ar-SA, etc.
+ * - Exchange rate management (updated every 24h)
+ * - Hijri & Gregorian date display
+ * - USD -> Target currency conversion utilities
+ *
+ * All metal prices are fetched in USD, then converted client-side
+ * using cached exchange rates from exchangerate-api.com
+ */
 
 export type CurrencyCode =
   | "USD"
@@ -28,13 +42,13 @@ export type CurrencyCode =
   | "AUD"
   | "ZAR"
   | "JOD"
-  | "MAD"
+  | "MAD";
 
 export interface Currency {
-  code: CurrencyCode
-  symbol: string
-  name: string
-  rate?: number // Exchange rate from USD (updated from API)
+  code: CurrencyCode;
+  symbol: string;
+  name: string;
+  rate?: number; // Exchange rate from USD (updated from API)
 }
 
 export const currencies: Record<CurrencyCode, Currency> = {
@@ -67,57 +81,56 @@ export const currencies: Record<CurrencyCode, Currency> = {
   JOD: { code: "JOD", symbol: "د.ا", name: "Jordanian Dinar" },
   MAD: { code: "MAD", symbol: "د.م.", name: "Moroccan Dirham" },
   NGN: { code: "NGN", symbol: "₦", name: "Nigerian Naira" },
-}
+};
 
 function getHijriDate() {
   const formatter = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", {
     day: "numeric",
     month: "long",
     year: "numeric",
-  })
-  return formatter.format(new Date())
+  });
+  return formatter.format(new Date());
 }
 
-// Auto-detect user's currency based on locale
 function detectUserCurrency(): CurrencyCode {
-  if (typeof window === "undefined") return "USD"
+  if (typeof window === "undefined") return "USD";
 
   try {
-    const locale = navigator.language || "en-US"
-    const country = locale.split("-")[1]?.toUpperCase()
+    const locale = navigator.language || "en-US";
+    const country = locale.split("-")[1]?.toUpperCase();
 
     switch (country) {
       // Gulf States
       case "SA":
-        return "SAR"
+        return "SAR";
       case "AE":
-        return "AED"
+        return "AED";
       case "QA":
-        return "QAR"
+        return "QAR";
       case "KW":
-        return "KWD"
+        return "KWD";
 
       // Major Muslim Countries
       case "EG":
-        return "EGP"
+        return "EGP";
       case "TR":
-        return "TRY"
+        return "TRY";
       case "PK":
-        return "PKR"
+        return "PKR";
       case "BD":
-        return "BDT"
+        return "BDT";
 
       // ASEAN
       case "MY":
-        return "MYR"
+        return "MYR";
       case "ID":
-        return "IDR"
+        return "IDR";
       case "IN":
-        return "INR"
+        return "INR";
 
       // Europe
       case "GB":
-        return "GBP"
+        return "GBP";
       case "DE":
       case "FR":
       case "IT":
@@ -125,116 +138,116 @@ function detectUserCurrency(): CurrencyCode {
       case "NL":
       case "AT":
       case "BE":
-        return "EUR"
+        return "EUR";
 
       // Others
       case "CA":
-        return "CAD"
+        return "CAD";
       case "AU":
-        return "AUD"
+        return "AUD";
       case "ZA":
-        return "ZAR"
+        return "ZAR";
       case "JO":
-        return "JOD"
+        return "JOD";
       case "MA":
-        return "MAD"
+        return "MAD";
       case "NG":
-        return "NGN"
+        return "NGN";
 
       default:
-        return "USD"
+        return "USD";
     }
   } catch {
-    return "USD"
+    return "USD";
   }
 }
 
 async function fetchExchangeRates(): Promise<Record<string, number> | null> {
   try {
-    const response = await fetch("/api/exchange-rates")
-    const data = await response.json()
+    const response = await fetch("/api/exchange-rates");
+    const data = await response.json();
 
     if (data.success && data.rates) {
-      return data.rates
+      return data.rates;
     }
 
-    throw new Error("Failed to fetch exchange rates from backend")
+    throw new Error("Failed to fetch exchange rates from backend");
   } catch (error) {
-    console.warn("Failed to fetch exchange rates:", error)
-    return null
+    console.error(error);
+    return null;
   }
 }
 
 interface CurrencyDateContextType {
-  currency: Currency
-  setCurrency: (currency: CurrencyCode) => void
-  hijriDate: string
-  gregorianDate: string
-  refreshDates: () => void
-  exchangeRates: Record<string, number> | null
-  convertFromUSD: (amount: number, toCurrency?: CurrencyCode) => number
-  isLoadingRates: boolean
+  currency: Currency;
+  setCurrency: (currency: CurrencyCode) => void;
+  hijriDate: string;
+  gregorianDate: string;
+  refreshDates: () => void;
+  exchangeRates: Record<string, number> | null;
+  convertFromUSD: (amount: number, toCurrency?: CurrencyCode) => number;
+  isLoadingRates: boolean;
 }
 
 const CurrencyDateContext = createContext<CurrencyDateContextType | undefined>(
   undefined
-)
+);
 
 export function CurrencyDateProvider({ children }: { children: ReactNode }) {
   const [currencyCode, setCurrencyCode] = useState<CurrencyCode>(() => {
-    if (typeof window === "undefined") return "USD"
-    return detectUserCurrency()
-  })
-  const [hijriDate, setHijriDate] = useState<string>("")
-  const [gregorianDate, setGregorianDate] = useState<string>("")
+    if (typeof window === "undefined") return "USD";
+    return detectUserCurrency();
+  });
+  const [hijriDate, setHijriDate] = useState<string>("");
+  const [gregorianDate, setGregorianDate] = useState<string>("");
   const [exchangeRates, setExchangeRates] = useState<Record<
     string,
     number
-  > | null>({})
-  const [isLoadingRates, setIsLoadingRates] = useState(true)
+  > | null>({});
+  const [isLoadingRates, setIsLoadingRates] = useState(true);
 
-  // ✅ Stabilize exchangeRates with useMemo to prevent unnecessary re-renders
-  // Using a serialized key to detect actual content changes
-  const exchangeRatesKey = exchangeRates ? JSON.stringify(exchangeRates) : null
+  // Stabilize exchangeRates with useMemo to prevent unnecessary re-renders
+  // using a serialized key to detect actual content changes instead of changes in object reference
+  const exchangeRatesKey = exchangeRates ? JSON.stringify(exchangeRates) : null;
   const stableExchangeRates = useMemo(
     () => exchangeRates,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [exchangeRatesKey]
-  )
+  );
 
   useEffect(() => {
     async function loadExchangeRates() {
-      setIsLoadingRates(true)
-      const rates = await fetchExchangeRates()
-      setExchangeRates(rates)
+      setIsLoadingRates(true);
+      const rates = await fetchExchangeRates();
+      setExchangeRates(rates);
 
-      setIsLoadingRates(false)
+      setIsLoadingRates(false);
     }
 
-    loadExchangeRates()
+    loadExchangeRates();
 
     // Update rates every 24 hours
-    const interval = setInterval(loadExchangeRates, 24 * 60 * 60 * 1000)
-    return () => clearInterval(interval)
-  }, [])
+    const interval = setInterval(loadExchangeRates, 24 * 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const convertFromUSD = (
     amount: number,
     toCurrency?: CurrencyCode
   ): number => {
-    const targetCurrency = toCurrency || currencyCode
-    if (targetCurrency === "USD") return amount
+    const targetCurrency = toCurrency || currencyCode;
+    if (targetCurrency === "USD") return amount;
 
-    if (!stableExchangeRates) return amount // Return original if rates not loaded
-    const rate = stableExchangeRates[targetCurrency]
-    if (!rate) return amount // Return original if no rate available
+    if (!stableExchangeRates) return amount; // Return original if rates not loaded
+    const rate = stableExchangeRates[targetCurrency];
+    if (!rate) return amount; // Return original if no rate available
 
-    return amount * rate
-  }
+    return amount * rate;
+  };
 
   const refreshDates = () => {
-    const now = new Date()
-    setHijriDate(getHijriDate())
+    const now = new Date();
+    setHijriDate(getHijriDate());
     setGregorianDate(
       now.toLocaleDateString("en-US", {
         weekday: "short",
@@ -242,19 +255,18 @@ export function CurrencyDateProvider({ children }: { children: ReactNode }) {
         month: "short",
         day: "numeric",
       })
-    )
-  }
+    );
+  };
 
-  // Initialize dates
   useEffect(() => {
-    refreshDates()
+    refreshDates();
 
     // Update dates every 24 hours
-    const interval = setInterval(refreshDates, 24 * 60 * 60 * 1000)
-    return () => clearInterval(interval)
-  }, [])
+    const interval = setInterval(refreshDates, 24 * 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const currency = currencies[currencyCode]
+  const currency = currencies[currencyCode];
 
   const value: CurrencyDateContextType = {
     currency,
@@ -265,21 +277,21 @@ export function CurrencyDateProvider({ children }: { children: ReactNode }) {
     exchangeRates: stableExchangeRates,
     convertFromUSD,
     isLoadingRates,
-  }
+  };
 
   return (
     <CurrencyDateContext.Provider value={value}>
       {children}
     </CurrencyDateContext.Provider>
-  )
+  );
 }
 
 export function useCurrencyDate() {
-  const context = useContext(CurrencyDateContext)
+  const context = useContext(CurrencyDateContext);
   if (context === undefined) {
     throw new Error(
       "useCurrencyDate must be used within a CurrencyDateProvider"
-    )
+    );
   }
-  return context
+  return context;
 }
