@@ -1,6 +1,7 @@
 import React from "react";
 import { Separator } from "../ui/shadcn/separator";
 import Link from "next/link";
+import Image from "next/image";
 
 export const Footer = () => {
   return (
@@ -10,9 +11,7 @@ export const Footer = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center justify-center md:justify-start space-x-2 mb-4">
-              <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">ن</span>
-              </div>
+              <Image src="/logo-192.png" alt="Logo" width={40} height={40} />
               <span className="font-bold text-stone-900">Nisab Tracker</span>
             </div>
             <p className="text-stone-600 text-sm leading-relaxed">
@@ -35,7 +34,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/calculator"
+                  href="/zakat-calculator"
                   className="hover:text-emerald-600 transition-colors"
                 >
                   Calculate Your Zakat

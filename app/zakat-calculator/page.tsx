@@ -1,9 +1,4 @@
-import { ZakatCalculator } from "@/components/calculator/ZakatCalculator"
-import { Metadata } from "next"
-
-export const metadata: Metadata = {
-  title: "Free Zakat Calculator",
-}
+import { ZakatCalculator } from "@/components/calculator/ZakatCalculator";
 
 export default function CalculatorPage() {
   return (
@@ -26,5 +21,5 @@ export default function CalculatorPage() {
         <ZakatCalculator />
       </main>
     </div>
-  )
+  );
 }

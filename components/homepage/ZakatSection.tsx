@@ -1,6 +1,6 @@
-import React from "react"
-import { Button } from "../ui/shadcn/button"
-import Link from "next/link"
+import React from "react";
+import { Button } from "../ui/shadcn/button";
+import Link from "next/link";
 
 export const ZakatSection = () => {
   return (
@@ -12,10 +12,10 @@ export const ZakatSection = () => {
           based on current Nisab values
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link href="/calculator">
+          <Link href="/zakat-calculator">
             <Button
               size="lg"
-              className="bg-white text-emerald-700 hover:bg-emerald-50 transition-all duration-200 px-8 py-4 text-lg font-semibold shadow-lg"
+              className="bg-white text-emerald-700 hover:bg-emerald-50 hover:cursor-pointer transition-all duration-200 px-8 py-4 text-lg font-semibold shadow-lg"
             >
               🧮 Calculate Zakat
             </Button>
@@ -29,7 +29,7 @@ export const ZakatSection = () => {
             <Button
               variant="outline"
               size="lg"
-              className="border-2 border-white/80 text-white bg-white/10 hover:bg-white hover:text-emerald-700 px-8 py-4 text-lg font-medium transition-all duration-200 backdrop-blur-sm"
+              className="border-2 border-white/80 text-white bg-white/10 hover:bg-white hover:text-emerald-700 hover:cursor-pointer px-8 py-4 text-lg font-medium transition-all duration-200 backdrop-blur-sm"
             >
               📚 Learn About Zakat
             </Button>
@@ -41,5 +41,5 @@ export const ZakatSection = () => {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};

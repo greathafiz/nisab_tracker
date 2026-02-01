@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import { Badge } from "../ui/shadcn/badge";
 import { Button } from "../ui/shadcn/button";
@@ -9,6 +8,7 @@ import {
   type CurrencyCode,
 } from "../../contexts/CurrencyDateContext";
 import Link from "next/link";
+import Image from "next/image";
 
 export const Header = () => {
   const { currency, setCurrency, hijriDate, gregorianDate } = useCurrencyDate();
@@ -23,18 +23,20 @@ export const Header = () => {
         <div className="flex justify-between items-center h-16 sm:h-20">
           <div className="flex items-center space-x-2 sm:space-x-3">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-sm sm:text-lg">
-                  ن
-                </span>
-              </div>
+              <Image
+                src="/logo-512.png"
+                alt="Logo"
+                width={40}
+                height={40}
+                priority
+              />
               <div>
                 <h1 className="text-lg sm:text-2xl font-bold text-stone-900 tracking-tight">
                   Nisab Tracker
                 </h1>
-                {/* <p className="text-xs text-stone-500 font-medium tracking-wide hidden sm:block">
+                <p className="text-xs text-stone-500 font-medium tracking-wide hidden md:block">
                   ISLAMIC FINANCIAL CALCULATOR
-                </p> */}
+                </p>
               </div>
             </Link>
           </div>
