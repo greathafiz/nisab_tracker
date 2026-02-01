@@ -44,10 +44,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@hafizaderemi",
     title: "Nisab Tracker | Free Zakat Calculator",
     description: "Nisab Tracker and Zakat Calculator",
     images: ["/og-image.png"],
   },
+  alternates: { languages: { en: "/en", ar: "/ar" } },
+  verification: { google: "UJhuIAMThdxkuHPVaUkmeN_c1QHDgtpqR2zMa7tAq1U" },
 };
 
 export default function RootLayout({

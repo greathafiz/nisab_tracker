@@ -40,14 +40,19 @@ export function generateOrganizationSchema(): WithContext<Organization> {
     "@type": "Organization",
     name: "Nisab Tracker",
     url: "https://nisabtracker.com",
-    logo: "https://nisabtracker.com/logo-192.png",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://nisabtracker.com/logo-192.png",
+      width: "192",
+      height: "192",
+    },
+    foundingDate: "2025-10-26",
+    founder: {
+      "@type": "Person",
+      name: "Abdul Hafiz Aderemi",
+    },
     description:
       "Providing free Islamic financial tools for calculating Zakat and tracking Nisab values.",
-    sameAs: [
-      // Add your social media links here when available
-      // "https://twitter.com/nisabtracker",
-      // "https://facebook.com/nisabtracker",
-    ],
   };
 }
 
