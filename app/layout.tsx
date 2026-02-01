@@ -25,11 +25,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Nisab Tracker | Free Zakat Calculator",
-  description: "Nisab Tracker and Free Zakat Calculator",
+  description: "Calculate your Zakat accurately with real-time Nisab values based on daily gold and silver prices. Free Islamic Zakat calculator for Muslims worldwide.",
   metadataBase: new URL("https://nisabtracker.com"),
   openGraph: {
     title: "Nisab Tracker | Free Zakat Calculator",
-    description: "Nisab Tracker and Free Zakat Calculator",
+    description: "Calculate your Zakat accurately with real-time Nisab values based on daily gold and silver prices. Free Islamic Zakat calculator for Muslims worldwide.",
     url: "https://nisabtracker.com",
     siteName: "Nisab Tracker",
     images: [

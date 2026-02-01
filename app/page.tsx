@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/shadcn/button";
 import { NisabCard } from "@/components/homepage/NisabCard";
 import { HeroSection } from "@/components/homepage/HeroSection";
 import { ZakatSection } from "@/components/homepage/ZakatSection";
-import { Footer } from "@/components/layouts/Footer";
 // import { HistoricalChart } from "@/components/homepage/HistoricalChart"
 // import { Separator } from "@/components/ui/shadcn/separator"
 
@@ -69,12 +68,10 @@ export default function Home() {
           }),
           currency: currency.code,
           lastUpdated: formatLastUpdated(data.lastUpdated),
-          goldPriceChange: `${
-            data.goldPriceChange >= 0 ? "+" : ""
-          }${data.goldPriceChange.toFixed(1)}%`,
-          silverPriceChange: `${
-            data.silverPriceChange >= 0 ? "+" : ""
-          }${data.silverPriceChange.toFixed(1)}%`,
+          goldPriceChange: `${data.goldPriceChange >= 0 ? "+" : ""
+            }${data.goldPriceChange.toFixed(1)}%`,
+          silverPriceChange: `${data.silverPriceChange >= 0 ? "+" : ""
+            }${data.silverPriceChange.toFixed(1)}%`,
           goldPricePerGram: data.goldPricePerGram || 0,
           silverPricePerGram: data.silverPricePerGram || 0,
         };
@@ -168,7 +165,6 @@ export default function Home() {
 
       <ZakatSection />
 
-      <Footer />
     </main>
   );
 }

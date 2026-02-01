@@ -1,4 +1,12 @@
-import { WebPage, WithContext, WebApplication, Organization } from "schema-dts";
+import {
+  WebPage,
+  WithContext,
+  WebApplication,
+  Organization,
+  Article,
+  FAQPage,
+  BreadcrumbList,
+} from "schema-dts";
 
 /**
  * Generate WebApplication schema for the Nisab Tracker
@@ -91,7 +99,7 @@ export function generateWebPageSchema(
  */
 export function generateFAQSchema(
   faqs: Array<{ question: string; answer: string }>
-) {
+): WithContext<FAQPage> {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -107,12 +115,52 @@ export function generateFAQSchema(
 }
 
 /**
+ * Generate Article schema
+ * This helps search engines understand blog posts and articles
+ */
+export function generateArticleSchema(data: {
+  title: string;
+  description: string;
+  image?: string;
+  datePublished: string;
+  dateModified: string;
+  authorName: string;
+  slug: string;
+}): WithContext<Article> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: data.title,
+    description: data.description,
+    image: data.image ? `https://nisabtracker.com${data.image}` : undefined,
+    datePublished: data.datePublished,
+    dateModified: data.dateModified || data.datePublished,
+    author: {
+      "@type": "Person",
+      name: data.authorName,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Nisab Tracker",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://nisabtracker.com/logo-192.png",
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://nisabtracker.com/blog/${data.slug}`,
+    },
+  };
+}
+
+/**
  * Generate BreadcrumbList schema
  * This helps search engines understand your site structure
  */
 export function generateBreadcrumbSchema(
   items: Array<{ name: string; url: string }>
-) {
+): WithContext<BreadcrumbList> {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
