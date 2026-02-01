@@ -11,6 +11,7 @@ import {
 } from "@/lib/schema";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { WebVitals } from "@/components/web-vitals";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -75,6 +76,14 @@ export default function RootLayout({
           </div>
         </CurrencyDateProvider>
         <SpeedInsights />
+
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-S08RYTFS3W" strategy="afterInteractive" />
+
+        <Script id="google-analytics" strategy="afterInteractive"> {` window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-S08RYTFS3W');`} </Script>
       </body>
     </html>
   );
