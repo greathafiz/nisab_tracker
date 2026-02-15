@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/shadcn/button";
 import { NisabCard } from "@/components/homepage/NisabCard";
 import { HeroSection } from "@/components/homepage/HeroSection";
 import { ZakatSection } from "@/components/homepage/ZakatSection";
-// import { HistoricalChart } from "@/components/homepage/HistoricalChart"
-// import { Separator } from "@/components/ui/shadcn/separator"
 
 interface NisabData {
   nisabGold: string;
@@ -154,17 +152,7 @@ export default function Home() {
           isLoading={isLoading}
         />
       </div>
-
-      {/* <Separator className="my-12" />
-
-      <div className="mb-16">
-        <HistoricalChart currency={data.currency} />
-      </div>
-
-      <Separator className="my-12" /> */}
-
       <ZakatSection />
-
     </main>
   );
 }

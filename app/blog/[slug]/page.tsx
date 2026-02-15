@@ -90,7 +90,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <JsonLd data={generateFAQSchema(post.faqs)} />
             )}
 
-            <div className="bg-white border-b border-stone-200 pt-10 pb-16">
+            <div className="md:bg-white md:border-b md:border-stone-200 pt-10 pb-16">
                 <div className="container mx-auto px-4 max-w-4xl text-center">
                     <div className="flex items-center justify-center space-x-2 text-sm text-emerald-600 font-medium mb-6">
                         <Link href="/blog" className="hover:underline">
@@ -104,25 +104,25 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                         {post.title}
                     </h1>
 
-                    <div className="flex items-center justify-center space-x-4 text-stone-500 text-sm">
+                    <div className="flex flex-wrap items-center justify-center sm:justify-center gap-x-4 gap-y-2 text-stone-500 text-sm">
                         <div className="flex items-center space-x-2">
                             <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
                                 {post.author.charAt(0)}
                             </div>
                             <span className="font-medium text-stone-900">{post.author}</span>
                         </div>
-                        <span>•</span>
+                        <span className="hidden sm:inline">•</span>
                         <time dateTime={post.publishedAt}>
                             {format(new Date(post.publishedAt), "MMMM d, yyyy")}
                         </time>
-                        <span>•</span>
+                        <span className="hidden sm:inline">•</span>
                         <span>{post.readingTime} read</span>
                     </div>
                 </div>
             </div>
 
-            <article className="container mx-auto px-4 max-w-3xl -mt-8">
-                <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-8 md:p-12">
+            <article className="container mx-auto px-4 max-w-3xl md:-mt-8">
+                <div className="md:bg-white shadow-none md:rounded-2xl md:shadow-sm md:border md:border-stone-100 p-4 md:p-12">
                     <div className="prose prose-stone prose-lg max-w-none prose-headings:text-emerald-950 prose-a:text-emerald-600 hover:prose-a:text-emerald-700 prose-img:rounded-xl">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
                     </div>
