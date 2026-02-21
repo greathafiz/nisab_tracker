@@ -11,7 +11,7 @@ interface HomePageWrapperProps {
 }
 
 export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
-    const { currency, exchangeRates, isLoadingRates } = useCurrencyDate();
+    const { currency, exchangeRates } = useCurrencyDate();
 
     // Determine exchange rate relative to USD
     const exchangeRate = currency.code === "USD" ? 1 : (exchangeRates?.[currency.code] ?? 1);
@@ -36,7 +36,6 @@ export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
                 goldPricePerGram={goldPricePerGramVal}
                 silverPricePerGram={silverPricePerGramVal}
                 currency={currency.code}
-                isLoading={isLoadingRates}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
@@ -49,7 +48,6 @@ export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
                     featured={true}
                     change={goldPriceChange}
                     icon="🥇"
-                    isLoading={isLoadingRates}
                 />
                 <NisabCard
                     title="Nisab (Silver)"
@@ -60,7 +58,6 @@ export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
                     featured={true}
                     change={silverPriceChange}
                     icon="🥈"
-                    isLoading={isLoadingRates}
                 />
             </div>
             <ZakatSection />

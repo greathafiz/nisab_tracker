@@ -196,10 +196,14 @@ const CurrencyDateContext = createContext<CurrencyDateContextType | undefined>(
 );
 
 export function CurrencyDateProvider({ children }: { children: ReactNode }) {
-  const [currencyCode, setCurrencyCode] = useState<CurrencyCode>(() => {
-    if (typeof window === "undefined") return "USD";
-    return detectUserCurrency();
-  });
+  const [currencyCode, setCurrencyCode] = useState<CurrencyCode>("USD");
+
+  useEffect(() => {
+    const detected = detectUserCurrency();
+    if (detected !== "USD") {
+      setCurrencyCode(detected);
+    }
+  }, []);
   const [hijriDate, setHijriDate] = useState<string>("");
   const [gregorianDate, setGregorianDate] = useState<string>("");
   const [exchangeRates, setExchangeRates] = useState<Record<
