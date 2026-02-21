@@ -59,10 +59,10 @@ export const HeroSection = ({
         </p>
       </div>
       <h2 className="text-5xl font-bold text-stone-900 mb-6 tracking-tight">
-        Islamic Financial Values
+        Today&apos;s Nisab Value
       </h2>
       <p className="text-xl text-stone-600 max-w-3xl mx-auto leading-relaxed">
-        Track real-time Nisab thresholds and calculate your Zakat obligations
+        Track real-time Nisab thresholds for today and calculate your Zakat obligations
         with
         <span className="font-semibold text-stone-700">
           {" "}

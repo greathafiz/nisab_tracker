@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentMetalPrices } from "@/lib/redis/metals-cache";
 
-interface NisabValues {
+export interface NisabValues {
   nisabGold: number;
   nisabSilver: number;
   dowry: number;

@@ -164,7 +164,9 @@ function detectUserCurrency(): CurrencyCode {
 
 async function fetchExchangeRates(): Promise<Record<string, number> | null> {
   try {
-    const response = await fetch("/api/exchange-rates");
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "");
+    const url = `${baseUrl}/api/exchange-rates`;
+    const response = await fetch(url);
     const data = await response.json();
 
     if (data.success && data.rates) {
