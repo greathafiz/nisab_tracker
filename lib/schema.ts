@@ -7,7 +7,7 @@ import {
   FAQPage,
   BreadcrumbList,
 } from "schema-dts";
-import { SITE_URL } from "./site";
+import { SITE_URL, AUTHOR } from "./site";
 
 /**
  * Generate WebApplication schema for the Nisab Tracker
@@ -57,7 +57,8 @@ export function generateOrganizationSchema(): WithContext<Organization> {
     foundingDate: "2025-10-26",
     founder: {
       "@type": "Person",
-      name: "Abdul Hafiz Aderemi",
+      name: AUTHOR.name,
+      url: AUTHOR.url,
     },
     description:
       "Providing free Islamic financial tools for calculating Zakat and tracking Nisab values.",
@@ -138,6 +139,7 @@ export function generateArticleSchema(data: {
     author: {
       "@type": "Person",
       name: data.authorName,
+      url: data.authorName === AUTHOR.name ? AUTHOR.url : undefined,
     },
     publisher: {
       "@type": "Organization",

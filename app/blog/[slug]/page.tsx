@@ -11,7 +11,7 @@ import remarkGfm from "remark-gfm";
 import { format } from "date-fns";
 import { Metadata } from "next";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { SITE_URL, OG_IMAGE } from "@/lib/site";
+import { SITE_URL, OG_IMAGE, AUTHOR } from "@/lib/site";
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -130,7 +130,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
                 {post.author.charAt(0)}
               </div>
-              <span className="font-medium text-stone-900">{post.author}</span>
+              {post.author === AUTHOR.name ? (
+                <a
+                  href={AUTHOR.url}
+                  target="_blank"
+                  rel="author noopener"
+                  className="font-medium text-stone-900 hover:text-emerald-700 transition-colors"
+                >
+                  {post.author}
+                </a>
+              ) : (
+                <span className="font-medium text-stone-900">
+                  {post.author}
+                </span>
+              )}
             </div>
             <span className="hidden sm:inline">•</span>
             <time dateTime={post.publishedAt}>

@@ -2,12 +2,18 @@ import React from "react";
 import { Separator } from "../ui/shadcn/separator";
 import Link from "next/link";
 import Image from "next/image";
+import { getAllPosts } from "@/lib/blog";
+import { AUTHOR } from "@/lib/site";
+
+const linkClassName = "hover:text-emerald-600 transition-colors";
 
 export const Footer = () => {
+  const latestPosts = getAllPosts().slice(0, 3);
+
   return (
     <footer className="border-t border-stone-200 bg-white mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
           {/* Brand */}
           <div>
             <div className="flex items-center justify-center md:justify-start space-x-2 mb-4">
@@ -20,46 +26,44 @@ export const Footer = () => {
             </p>
           </div>
 
-          {/* Resources */}
+          {/* Tools */}
           <div>
-            <h4 className="font-semibold text-stone-900 mb-4">Learn More</h4>
+            <h4 className="font-semibold text-stone-900 mb-4">Tools</h4>
             <ul className="space-y-2 text-sm text-stone-600">
               <li>
-                <Link
-                  href="#understanding-nisab"
-                  className="hover:text-emerald-600 transition-colors"
-                >
-                  Understanding Nisab
+                <Link href="/" className={linkClassName}>
+                  Today&apos;s Nisab
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/zakat-calculator"
-                  className="hover:text-emerald-600 transition-colors"
-                >
-                  Calculate Your Zakat
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#data-sources"
-                  className="hover:text-emerald-600 transition-colors"
-                >
-                  Data Sources
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#contact"
-                  className="hover:text-emerald-600 transition-colors"
-                >
-                  Contact & Feedback
+                <Link href="/zakat-calculator" className={linkClassName}>
+                  Zakat Calculator
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Updates */}
+          {/* Guides */}
+          <div>
+            <h4 className="font-semibold text-stone-900 mb-4">Guides</h4>
+            <ul className="space-y-2 text-sm text-stone-600">
+              {latestPosts.map((post) => (
+                <li key={post.slug}>
+                  <Link href={`/blog/${post.slug}`} className={linkClassName}>
+                    {/* Titles carry SEO suffixes like ": Complete Guide 2026" that are too long here */}
+                    {post.title.split(":")[0].replace(/\?.*$/, "?")}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link href="/blog" className={`${linkClassName} font-medium`}>
+                  All articles →
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Features */}
           <div>
             <h4 className="font-semibold text-stone-900 mb-4">Features</h4>
             <div className="text-sm text-stone-600 space-y-2">
@@ -75,8 +79,16 @@ export const Footer = () => {
 
         <div className="text-center text-stone-500 text-sm">
           <p>
-            Built with love for the Muslim community • May Allah accept our
-            efforts
+            Built with love for the Muslim community by{" "}
+            <a
+              href={AUTHOR.url}
+              target="_blank"
+              rel="author noopener"
+              className="whitespace-nowrap font-medium text-stone-700 underline decoration-stone-300 underline-offset-4 hover:text-emerald-700 hover:decoration-emerald-600 transition-colors"
+            >
+              {AUTHOR.name}
+            </a>{" "}
+            • May Allah accept our efforts
           </p>
           <p className="mt-2 text-xs">
             © {new Date().getFullYear()} Nisab Tracker. Free forever.
