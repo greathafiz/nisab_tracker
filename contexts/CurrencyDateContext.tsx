@@ -24,6 +24,7 @@ import React, {
 
 import { currencies, type Currency, type CurrencyCode } from "@/lib/currencies";
 import {
+  NISAB_STANDARDS,
   defaultStandardFor,
   type NisabStandardId,
 } from "@/lib/nisab-standards";
@@ -127,6 +128,43 @@ function detectUserCurrency(): CurrencyCode {
   }
 }
 
+// The visitor's chosen Nisab standard, remembered in localStorage across visits
+const STANDARD_STORAGE_KEY = "nisabStandard";
+const standardListeners = new Set<() => void>();
+// Fallback for when storage is blocked (e.g. some private modes): lasts for this visit
+let memoryStandard: NisabStandardId | null = null;
+
+function readStoredStandard(): NisabStandardId | null {
+  try {
+    const value = localStorage.getItem(STANDARD_STORAGE_KEY);
+    return value && value in NISAB_STANDARDS
+      ? (value as NisabStandardId)
+      : memoryStandard;
+  } catch {
+    return memoryStandard;
+  }
+}
+
+function storeStandard(standard: NisabStandardId) {
+  memoryStandard = standard;
+  try {
+    localStorage.setItem(STANDARD_STORAGE_KEY, standard);
+  } catch {
+    // Storage blocked: memoryStandard keeps the choice for this visit
+  }
+  standardListeners.forEach((listener) => listener());
+}
+
+function subscribeToStandard(onChange: () => void) {
+  standardListeners.add(onChange);
+  // Keep other tabs in sync
+  window.addEventListener("storage", onChange);
+  return () => {
+    standardListeners.delete(onChange);
+    window.removeEventListener("storage", onChange);
+  };
+}
+
 async function fetchExchangeRates(): Promise<Record<string, number> | null> {
   try {
     const baseUrl =
@@ -178,8 +216,11 @@ export function CurrencyDateProvider({ children }: { children: ReactNode }) {
   );
   const currencyCode = selectedCode ?? detectedCode;
 
-  const [selectedStandard, setSelectedStandard] =
-    useState<NisabStandardId | null>(null);
+  const selectedStandard = useSyncExternalStore(
+    subscribeToStandard,
+    readStoredStandard,
+    () => null
+  );
   const nisabStandard = selectedStandard ?? defaultStandardFor(currencyCode);
 
   const hijriDate = useSyncExternalStore(
@@ -223,7 +264,7 @@ export function CurrencyDateProvider({ children }: { children: ReactNode }) {
     convertFromUSD: (amount) => amount * (rate ?? 1),
     ratesUnavailable: !rate && !isLoadingRates,
     nisabStandard,
-    setNisabStandard: setSelectedStandard,
+    setNisabStandard: storeStandard,
     hijriDate,
     gregorianDate,
   };
