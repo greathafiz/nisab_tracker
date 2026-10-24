@@ -4,6 +4,8 @@ import { useCurrencyDate } from "@/contexts/CurrencyDateContext";
 interface PricesNoticeProps {
   isStale: boolean;
   lastUpdated: string;
+  // Off for pages that convert currency on the server rather than with the visitor's selected currency
+  checkRates?: boolean;
 }
 
 /**
@@ -11,8 +13,13 @@ interface PricesNoticeProps {
  * prices that haven't refreshed recently, or values shown in USD because
  * exchange rates couldn't be loaded.
  */
-export function PricesNotice({ isStale, lastUpdated }: PricesNoticeProps) {
-  const { currency, ratesUnavailable } = useCurrencyDate();
+export function PricesNotice({
+  isStale,
+  lastUpdated,
+  checkRates = true,
+}: PricesNoticeProps) {
+  const { currency, ratesUnavailable: ratesFailed } = useCurrencyDate();
+  const ratesUnavailable = checkRates && ratesFailed;
 
   if (!isStale && !ratesUnavailable) return null;
 

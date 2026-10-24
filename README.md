@@ -45,6 +45,10 @@ Without `STORAGE_REDIS_URL`, the build still succeeds but prerenders the "failed
 
 The pre-commit hook (Husky + lint-staged) runs ESLint and Prettier on staged files, then a full build.
 
+## Country pages
+
+`/nisab` and `/nisab/[country]` show the Nisab in each local currency, rendered on the server so search engines see local values. Countries are listed in `lib/countries.ts`; to add one, add an entry there (its currency must be in `lib/currencies.ts`). The sitemap, llms.txt and the country links pick it up automatically.
+
 ## Blog
 
 Posts are Markdown files in `app/blog/_content/` with frontmatter (title, description, dates, keywords, FAQs). New posts appear on `/blog` and in the sitemap automatically.
