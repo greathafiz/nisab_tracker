@@ -1,10 +1,9 @@
-import React from "react";
 import { Button } from "../ui/shadcn/button";
 import Link from "next/link";
 
 export const ZakatSection = () => {
   return (
-    <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-3xl p-12 text-center text-white relative overflow-hidden">
+    <div className="bg-linear-to-r from-emerald-600 to-emerald-700 rounded-3xl p-12 text-center text-white relative overflow-hidden">
       <div className="relative z-10">
         <h3 className="text-3xl font-bold mb-4">Calculate Your Zakat</h3>
         <p className="text-emerald-100 text-lg mb-8 max-w-2xl mx-auto">
@@ -21,11 +20,7 @@ export const ZakatSection = () => {
             </Button>
           </Link>
 
-          <a
-            href="https://www.investopedia.com/terms/z/zakat.asp"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link href="/blog/how-to-calculate-zakat">
             <Button
               variant="outline"
               size="lg"
@@ -33,7 +28,7 @@ export const ZakatSection = () => {
             >
               📚 Learn About Zakat
             </Button>
-          </a>
+          </Link>
         </div>
         <p className="text-emerald-200 text-sm mt-6">
           ✓ Free forever ✓ Privacy focused
