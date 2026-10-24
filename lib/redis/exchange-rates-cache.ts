@@ -1,37 +1,36 @@
-import { redis } from "./redis-config";
+import { redis, getWithDailyRefresh } from "./redis-config";
 
 export interface ExchangeRatesCache {
   rates: Record<string, number>;
   lastUpdated: string;
-  source: "exchangerate-api" | "frankfurter" | "fallback";
+  fetchedAt?: string;
+  source: "exchangerate-api";
 }
 
 const EXCHANGE_RATES_KEY = "exchange:rates";
 
 /**
- * Fetch and cache exchange rates
+ * Fetch and cache exchange rates. Returns null if the fetch fails,
+ * leaving the last good rates in the cache.
  */
 export async function updateExchangeRatesCache(): Promise<ExchangeRatesCache | null> {
-  const result = await fetchFromExchangeRateAPI();
-  await redis.set(EXCHANGE_RATES_KEY, result);
-  return result;
+  const fresh = await fetchFromExchangeRateAPI();
+  if (!fresh) return null;
+
+  fresh.fetchedAt = new Date().toISOString();
+  await redis.set(EXCHANGE_RATES_KEY, fresh);
+  return fresh;
 }
 
 /**
- * Get cached exchange rates from Redis
+ * Get cached exchange rates from Redis, refreshing them if they're over a day old
  */
 export async function getCachedExchangeRates(): Promise<ExchangeRatesCache | null> {
   try {
-    const cached = await redis.get<ExchangeRatesCache>(EXCHANGE_RATES_KEY);
-
-    if (!cached) return await updateExchangeRatesCache();
-
-    const cacheAge = Date.now() - new Date(cached.lastUpdated).getTime();
-    const ONE_DAY = 24 * 60 * 60 * 1000;
-
-    if (cacheAge > ONE_DAY) return await updateExchangeRatesCache();
-
-    return cached;
+    return await getWithDailyRefresh(
+      EXCHANGE_RATES_KEY,
+      updateExchangeRatesCache
+    );
   } catch (error) {
     console.error("Redis fetch error:", error);
     return null;
@@ -51,8 +50,12 @@ async function fetchFromExchangeRateAPI(): Promise<ExchangeRatesCache | null> {
 
     const data = await response.json();
 
+    if (data.result !== "success" || !data.conversion_rates) {
+      throw new Error(`Invalid response: ${data["error-type"] ?? "unknown"}`);
+    }
+
     return {
-      rates: data.conversion_rates || {},
+      rates: data.conversion_rates,
       lastUpdated: new Date(data.time_last_update_unix * 1000).toISOString(),
       source: "exchangerate-api",
     };

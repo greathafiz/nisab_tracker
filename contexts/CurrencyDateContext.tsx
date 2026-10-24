@@ -4,7 +4,7 @@ import React, {
   useContext,
   useState,
   useEffect,
-  useMemo,
+  useSyncExternalStore,
   ReactNode,
 } from "react";
 
@@ -92,6 +92,26 @@ function getHijriDate() {
   return formatter.format(new Date());
 }
 
+function getGregorianDate() {
+  return new Date().toLocaleDateString("en-US", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+// Re-read the dates every minute so they roll over at midnight
+function subscribeToClock(onChange: () => void) {
+  const interval = setInterval(onChange, 60 * 1000);
+  return () => clearInterval(interval);
+}
+
+// The browser locale doesn't change during a visit, so there's nothing to subscribe to
+function subscribeToNothing() {
+  return () => {};
+}
+
 function detectUserCurrency(): CurrencyCode {
   if (typeof window === "undefined") return "USD";
 
@@ -164,7 +184,9 @@ function detectUserCurrency(): CurrencyCode {
 
 async function fetchExchangeRates(): Promise<Record<string, number> | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "");
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      (typeof window !== "undefined" ? window.location.origin : "");
     const url = `${baseUrl}/api/exchange-rates`;
     const response = await fetch(url);
     const data = await response.json();
@@ -181,14 +203,18 @@ async function fetchExchangeRates(): Promise<Record<string, number> | null> {
 }
 
 interface CurrencyDateContextType {
+  // The currency the visitor picked, or the one detected from their locale
   currency: Currency;
   setCurrency: (currency: CurrencyCode) => void;
+  // The currency amounts are actually shown in: the selected one once its exchange
+  // rate has loaded, USD until then or if the rate is unavailable
+  displayCurrency: Currency;
+  // Converts a USD amount into displayCurrency
+  convertFromUSD: (amount: number) => number;
+  // True when rates failed to load, so a non-USD selection is being shown in USD
+  ratesUnavailable: boolean;
   hijriDate: string;
   gregorianDate: string;
-  refreshDates: () => void;
-  exchangeRates: Record<string, number> | null;
-  convertFromUSD: (amount: number, toCurrency?: CurrencyCode) => number;
-  isLoadingRates: boolean;
 }
 
 const CurrencyDateContext = createContext<CurrencyDateContextType | undefined>(
@@ -196,37 +222,36 @@ const CurrencyDateContext = createContext<CurrencyDateContextType | undefined>(
 );
 
 export function CurrencyDateProvider({ children }: { children: ReactNode }) {
-  const [currencyCode, setCurrencyCode] = useState<CurrencyCode>("USD");
+  const [selectedCode, setSelectedCode] = useState<CurrencyCode | null>(null);
+  const detectedCode = useSyncExternalStore<CurrencyCode>(
+    subscribeToNothing,
+    detectUserCurrency,
+    () => "USD"
+  );
+  const currencyCode = selectedCode ?? detectedCode;
 
-  useEffect(() => {
-    const detected = detectUserCurrency();
-    if (detected !== "USD") {
-      setCurrencyCode(detected);
-    }
-  }, []);
-  const [hijriDate, setHijriDate] = useState<string>("");
-  const [gregorianDate, setGregorianDate] = useState<string>("");
+  const hijriDate = useSyncExternalStore(
+    subscribeToClock,
+    getHijriDate,
+    () => ""
+  );
+  const gregorianDate = useSyncExternalStore(
+    subscribeToClock,
+    getGregorianDate,
+    () => ""
+  );
+
   const [exchangeRates, setExchangeRates] = useState<Record<
     string,
     number
-  > | null>({});
+  > | null>(null);
   const [isLoadingRates, setIsLoadingRates] = useState(true);
-
-  // Stabilize exchangeRates with useMemo to prevent unnecessary re-renders
-  // using a serialized key to detect actual content changes instead of changes in object reference
-  const exchangeRatesKey = exchangeRates ? JSON.stringify(exchangeRates) : null;
-  const stableExchangeRates = useMemo(
-    () => exchangeRates,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [exchangeRatesKey]
-  );
 
   useEffect(() => {
     async function loadExchangeRates() {
-      setIsLoadingRates(true);
       const rates = await fetchExchangeRates();
-      setExchangeRates(rates);
-
+      // Keep the rates we already have if a later refresh fails
+      if (rates) setExchangeRates(rates);
       setIsLoadingRates(false);
     }
 
@@ -237,52 +262,16 @@ export function CurrencyDateProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, []);
 
-  const convertFromUSD = (
-    amount: number,
-    toCurrency?: CurrencyCode
-  ): number => {
-    const targetCurrency = toCurrency || currencyCode;
-    if (targetCurrency === "USD") return amount;
-
-    if (!stableExchangeRates) return amount; // Return original if rates not loaded
-    const rate = stableExchangeRates[targetCurrency];
-    if (!rate) return amount; // Return original if no rate available
-
-    return amount * rate;
-  };
-
-  const refreshDates = () => {
-    const now = new Date();
-    setHijriDate(getHijriDate());
-    setGregorianDate(
-      now.toLocaleDateString("en-US", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
-    );
-  };
-
-  useEffect(() => {
-    refreshDates();
-
-    // Update dates every 24 hours
-    const interval = setInterval(refreshDates, 24 * 60 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const currency = currencies[currencyCode];
+  const rate = currencyCode === "USD" ? 1 : exchangeRates?.[currencyCode];
 
   const value: CurrencyDateContextType = {
-    currency,
-    setCurrency: setCurrencyCode,
+    currency: currencies[currencyCode],
+    setCurrency: setSelectedCode,
+    displayCurrency: rate ? currencies[currencyCode] : currencies.USD,
+    convertFromUSD: (amount) => amount * (rate ?? 1),
+    ratesUnavailable: !rate && !isLoadingRates,
     hijriDate,
     gregorianDate,
-    refreshDates,
-    exchangeRates: stableExchangeRates,
-    convertFromUSD,
-    isLoadingRates,
   };
 
   return (

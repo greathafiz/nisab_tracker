@@ -1,5 +1,5 @@
 import { TROY_OUNCE_TO_GRAMS } from "../utils";
-import { redis } from "./redis-config";
+import { redis, getWithDailyRefresh } from "./redis-config";
 
 export interface MetalsPriceCache {
   goldPricePerGram: number;
@@ -7,7 +7,8 @@ export interface MetalsPriceCache {
   goldPriceChange: number; // 24h change %
   silverPriceChange: number; // 24h change %
   lastUpdated: string;
-  source: "metalpriceapi" | "goldpriceio" | "islamicapi" | "fallback";
+  fetchedAt?: string;
+  source: "metalpriceapi" | "goldpriceio" | "islamicapi";
 }
 
 interface PreviousDayPrices {
@@ -19,13 +20,13 @@ interface PreviousDayPrices {
 /**
  * Metals Price Cache Module
  *
- * Manages current gold/silver prices with 3-tier fallback system:
+ * Manages current gold/silver prices with a 3-tier fallback system:
  * 1. Primary: metalpriceapi.com (100 req/month)
- * 2. Fallback 1: goldprice.io (100 req/month)
+ * 2. Fallback 1: goldapi.io (100 req/month)
  * 3. Fallback 2: islamicapi.com (limited to Islamic finance data)
- * 4. Static fallback: Hardcoded prices for emergency use
  *
- * Prices are stored in Redis and updated daily via cron job.
+ * Prices are stored in Redis and updated daily via cron job. If every source fails,
+ * the last good prices stay in the cache; we never show made-up prices.
  * Previous day's prices are kept for calculating 24h change percentage.
  */
 
@@ -33,65 +34,34 @@ const METALS_CACHE_KEY = "metals:current";
 const PREVIOUS_PRICES_KEY = "metals:previous";
 
 /**
- * Fetch and cache metal prices from multiple sources with fallback chain
+ * Fetch prices from each source in turn and cache the first that succeeds.
+ * Returns null if every source fails, leaving the existing cache untouched.
  */
-export async function updateCurrentMetalPrices(): Promise<MetalsPriceCache> {
-  // Try metalpriceapi.com first
-  const metalPriceApiResult = await fetchFromMetalPriceAPI();
-  if (metalPriceApiResult) {
-    await saveToCacheWithHistory(metalPriceApiResult);
-    return metalPriceApiResult;
+export async function updateCurrentMetalPrices(): Promise<MetalsPriceCache | null> {
+  const fresh =
+    (await fetchFromMetalPriceAPI()) ??
+    (await fetchFromGoldAPIIO()) ??
+    (await fetchFromIslamicAPI());
+
+  if (!fresh) {
+    console.error("All metal price APIs failed");
+    return null;
   }
 
-  // Fallback to goldapi.io
-  const goldPriceResult = await fetchFromGoldAPIIO();
-  if (goldPriceResult) {
-    await saveToCacheWithHistory(goldPriceResult);
-    return goldPriceResult;
-  }
-
-  // Fallback to islamicapi.com
-  const islamicAPIResult = await fetchFromIslamicAPI();
-  if (islamicAPIResult) {
-    await saveToCacheWithHistory(islamicAPIResult);
-    return islamicAPIResult;
-  }
-
-  // Final fallback: use cached data or static fallback
-  const cachedData = await getCurrentMetalPrices();
-  if (cachedData) {
-    console.warn("⚠️ All APIs failed, using cached data from Redis");
-    return cachedData;
-  }
-
-  console.error("All APIs failed, using static fallback");
-  const fallback = getStaticFallback();
-  await redis.set(METALS_CACHE_KEY, fallback);
-  return fallback;
+  fresh.fetchedAt = new Date().toISOString();
+  await saveToCacheWithHistory(fresh);
+  return fresh;
 }
 
 /**
- * Get cached prices from Redis
+ * Get cached prices from Redis, refreshing them if they're over a day old
  */
 export async function getCurrentMetalPrices(): Promise<MetalsPriceCache | null> {
   try {
-    const cached = await redis.get<MetalsPriceCache>(METALS_CACHE_KEY);
-
-    if (!cached) {
-      console.log("💾 No cache found in Redis, fetching fresh data...");
-      return await updateCurrentMetalPrices();
-    }
-
-    // Check if cache is stale (older than 24 hours)
-    const cacheAge = Date.now() - new Date(cached.lastUpdated).getTime();
-    const ONE_DAY = 24 * 60 * 60 * 1000;
-
-    if (cacheAge > ONE_DAY) {
-      console.log("⏰ Cache is stale, refreshing...");
-      return await updateCurrentMetalPrices();
-    }
-
-    return cached;
+    return await getWithDailyRefresh(
+      METALS_CACHE_KEY,
+      updateCurrentMetalPrices
+    );
   } catch (error) {
     console.error("Redis fetch error:", error);
     return null;
@@ -126,6 +96,12 @@ async function saveToCacheWithHistory(cache: MetalsPriceCache): Promise<void> {
   await redis.set(PREVIOUS_PRICES_KEY, newPreviousPrices);
 }
 
+function unixToISOString(timestamp: number | undefined): string {
+  return timestamp
+    ? new Date(timestamp * 1000).toISOString()
+    : new Date().toISOString();
+}
+
 /**
  * Primary: metalpriceapi.com
  */
@@ -157,9 +133,7 @@ async function fetchFromMetalPriceAPI(): Promise<MetalsPriceCache | null> {
       silverPricePerGram: Number(silverPricePerGram.toFixed(4)),
       goldPriceChange: 0, // Will be calculated when saving
       silverPriceChange: 0,
-      lastUpdated:
-        new Date(data.timestamp * 1000).toISOString() ||
-        new Date().toISOString(),
+      lastUpdated: unixToISOString(data.timestamp),
       source: "metalpriceapi",
     };
   } catch (error) {
@@ -198,10 +172,7 @@ async function fetchFromGoldAPIIO(): Promise<MetalsPriceCache | null> {
       silverPricePerGram: Number(silverData.price_gram_24k.toFixed(4)),
       goldPriceChange: 0,
       silverPriceChange: 0,
-      lastUpdated:
-        new Date(goldData.timestamp * 1000).toISOString() ||
-        new Date(silverData.timestamp * 1000).toISOString() ||
-        new Date().toISOString(),
+      lastUpdated: unixToISOString(goldData.timestamp ?? silverData.timestamp),
       source: "goldpriceio",
     };
   } catch (error) {
@@ -259,18 +230,4 @@ function calculatePriceChange(
 
   const change = ((currentPrice - previousPrice) / previousPrice) * 100;
   return Number(change.toFixed(2));
-}
-
-/**
- * Static fallback data (last resort)
- */
-function getStaticFallback(): MetalsPriceCache {
-  return {
-    goldPricePerGram: 85.17, // ~$2,650/oz ÷ 31.1035 g/oz
-    silverPricePerGram: 0.98, // ~$30.5/oz ÷ 31.1035 g/oz
-    goldPriceChange: 0,
-    silverPriceChange: 0,
-    lastUpdated: new Date().toISOString(),
-    source: "fallback",
-  };
 }

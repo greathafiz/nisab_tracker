@@ -1,5 +1,4 @@
 import { updateCurrentMetalPrices } from "@/lib/redis/metals-cache";
-// import { updateHistoricalPricesCache } from "@/lib/redis/historical-cache"
 import { updateExchangeRatesCache } from "@/lib/redis/exchange-rates-cache";
 import { NextResponse } from "next/server";
 
@@ -11,7 +10,6 @@ export async function GET(request: Request) {
 
   const results = {
     metalPrices: null as unknown,
-    historicalData: null as unknown,
     exchangeRates: null as unknown,
     errors: [] as string[],
   };
@@ -21,31 +19,27 @@ export async function GET(request: Request) {
     results.metalPrices = await updateCurrentMetalPrices();
   } catch (error) {
     console.error("Failed to update metal prices:", error);
-    results.errors.push("metal prices");
   }
-
-  // Update historical data (7-day + 30-day)
-  // try {
-  //   results.historicalData = await updateHistoricalPricesCache()
-  // } catch (error) {
-  //   console.error("Failed to update historical data:", error)
-  //   results.errors.push("historical data")
-  // }
+  if (!results.metalPrices) results.errors.push("metal prices");
 
   // Update exchange rates
   try {
     results.exchangeRates = await updateExchangeRatesCache();
   } catch (error) {
     console.error("Failed to update exchange rates:", error);
-    results.errors.push("exchange rates");
   }
+  if (!results.exchangeRates) results.errors.push("exchange rates");
 
   const success = results.errors.length === 0;
 
-  return NextResponse.json({
-    success,
-    timestamp: new Date().toISOString(),
-    results,
-    errors: results.errors.length > 0 ? results.errors : undefined,
-  });
+  // A non-2xx status makes failed runs show up as errors in Vercel's cron logs
+  return NextResponse.json(
+    {
+      success,
+      timestamp: new Date().toISOString(),
+      results,
+      errors: results.errors.length > 0 ? results.errors : undefined,
+    },
+    { status: success ? 200 : 500 }
+  );
 }

@@ -1,13 +1,15 @@
 interface HeroSectionProps {
-  lastUpdated: string
-  goldPricePerGram?: number
-  silverPricePerGram?: number
-  currency?: string
-  isLoading?: boolean
+  lastUpdated: string;
+  isStale?: boolean;
+  goldPricePerGram?: number;
+  silverPricePerGram?: number;
+  currency?: string;
+  isLoading?: boolean;
 }
 
 export const HeroSection = ({
   lastUpdated,
+  isStale = false,
   goldPricePerGram,
   silverPricePerGram,
   currency,
@@ -15,12 +17,18 @@ export const HeroSection = ({
 }: HeroSectionProps) => {
   return (
     <div className="text-center mb-16">
-      {lastUpdated && (
-        <div className="inline-flex items-center space-x-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
-          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-          <span>Live Data • Updated {lastUpdated}</span>
-        </div>
-      )}
+      {lastUpdated &&
+        (isStale ? (
+          <div className="inline-flex items-center space-x-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+            <span>Updated {lastUpdated}</span>
+          </div>
+        ) : (
+          <div className="inline-flex items-center space-x-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            <span>Live Data • Updated {lastUpdated}</span>
+          </div>
+        ))}
 
       {/* Current spot prices - small and subtle */}
       {goldPricePerGram && silverPricePerGram && currency && (
@@ -62,8 +70,8 @@ export const HeroSection = ({
         Today&apos;s Nisab Value
       </h2>
       <p className="text-xl text-stone-600 max-w-3xl mx-auto leading-relaxed">
-        Track real-time Nisab thresholds for today and calculate your Zakat obligations
-        with
+        Track real-time Nisab thresholds for today and calculate your Zakat
+        obligations with
         <span className="font-semibold text-stone-700">
           {" "}
           accurate, up-to-date
@@ -81,5 +89,5 @@ export const HeroSection = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

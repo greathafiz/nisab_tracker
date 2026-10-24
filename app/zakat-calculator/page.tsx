@@ -1,6 +1,14 @@
 import { ZakatCalculator } from "@/components/calculator/ZakatCalculator";
+import { PricesUnavailable } from "@/components/ui/PricesUnavailable";
+import { getNisabValuesForPage } from "@/lib/nisab";
 
-export default function CalculatorPage() {
+export const revalidate = 3600;
+
+export default async function CalculatorPage() {
+  const nisab = await getNisabValuesForPage();
+
+  if (!nisab) return <PricesUnavailable />;
+
   return (
     <div>
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -18,7 +26,7 @@ export default function CalculatorPage() {
           </p>
         </div>
 
-        <ZakatCalculator />
+        <ZakatCalculator nisab={nisab} />
       </main>
     </div>
   );
