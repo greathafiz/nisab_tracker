@@ -8,12 +8,18 @@ import {
 } from "../../contexts/CurrencyDateContext";
 import Link from "next/link";
 import Image from "next/image";
+import { trackEvent } from "@/lib/analytics";
 
 const CurrencySelector = ({ className = "" }: { className?: string }) => {
   const { currency, setCurrency } = useCurrencyDate();
 
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCurrency(e.target.value as CurrencyCode);
+    const code = e.target.value as CurrencyCode;
+    setCurrency(code);
+    trackEvent({
+      name: "currency_change",
+      params: { selected_currency: code },
+    });
   };
 
   return (

@@ -1,33 +1,34 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/shadcn/card"
-import { Button } from "@/components/ui/shadcn/button"
-import { Input } from "@/components/ui/shadcn/input"
+} from "@/components/ui/shadcn/card";
+import { Button } from "@/components/ui/shadcn/button";
+import { Input } from "@/components/ui/shadcn/input";
+import { trackEvent } from "@/lib/analytics";
 
 export function ZakatReminderCard() {
-  const [email, setEmail] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address")
-      return
+      setError("Please enter a valid email address");
+      return;
     }
 
-    setIsSubmitting(true)
-    setError(null)
+    setIsSubmitting(true);
+    setError(null);
 
     try {
       // Submit to Google Sheets via Google Forms or Apps Script Web App
@@ -36,21 +37,22 @@ export function ZakatReminderCard() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, timestamp: new Date().toISOString() }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to submit")
+        throw new Error("Failed to submit");
       }
 
-      setIsSubmitted(true)
-      setEmail("")
+      setIsSubmitted(true);
+      setEmail("");
+      trackEvent({ name: "reminder_signup" });
     } catch (err) {
-      console.error("Submission error:", err)
-      setError("Something went wrong. Please try again.")
+      console.error("Submission error:", err);
+      setError("Something went wrong. Please try again.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   if (isSubmitted) {
     return (
@@ -71,7 +73,7 @@ export function ZakatReminderCard() {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -118,5 +120,5 @@ export function ZakatReminderCard() {
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }
