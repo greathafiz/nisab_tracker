@@ -10,7 +10,6 @@ import {
   generateOrganizationSchema,
 } from "@/lib/schema";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { WebVitals } from "@/components/web-vitals";
 import Script from "next/script";
 
 const geistSans = Geist({
@@ -25,11 +24,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Nisab Tracker | Free Zakat Calculator",
-  description: "Calculate your Zakat accurately with real-time Nisab values based on daily gold and silver prices. Free Islamic Zakat calculator for Muslims worldwide.",
+  description:
+    "Calculate your Zakat accurately with real-time Nisab values based on daily gold and silver prices. Free Islamic Zakat calculator for Muslims worldwide.",
   metadataBase: new URL("https://nisabtracker.com"),
   openGraph: {
     title: "Nisab Tracker | Free Zakat Calculator",
-    description: "Calculate your Zakat accurately with real-time Nisab values based on daily gold and silver prices. Free Islamic Zakat calculator for Muslims worldwide.",
+    description:
+      "Calculate your Zakat accurately with real-time Nisab values based on daily gold and silver prices. Free Islamic Zakat calculator for Muslims worldwide.",
     url: "https://nisabtracker.com",
     siteName: "Nisab Tracker",
     images: [
@@ -64,7 +65,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <WebVitals />
         <JsonLd data={generateWebApplicationSchema()} />
         <JsonLd data={generateOrganizationSchema()} />
 
@@ -77,13 +77,19 @@ export default function RootLayout({
         </CurrencyDateProvider>
         <SpeedInsights />
 
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-S08RYTFS3W" strategy="afterInteractive" />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-S08RYTFS3W"
+          strategy="afterInteractive"
+        />
 
-        <Script id="google-analytics" strategy="afterInteractive"> {` window.dataLayer = window.dataLayer || [];
+        <Script id="google-analytics" strategy="afterInteractive">
+          {" "}
+          {` window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
 
-          gtag('config', 'G-S08RYTFS3W');`} </Script>
+          gtag('config', 'G-S08RYTFS3W');`}{" "}
+        </Script>
       </body>
     </html>
   );

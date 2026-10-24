@@ -33,7 +33,6 @@ export function generateWebApplicationSchema(): WithContext<WebApplication> {
       "Multi-currency support",
       "Nisab calculation based on Islamic standards",
       "Zakat calculator",
-      //   "Historical price charts",
     ],
   };
 }
