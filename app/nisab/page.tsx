@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getNisabValuesForPage, getExchangeRatesForPage } from "@/lib/nisab";
 import {
-  getNisabValuesForPage,
-  getExchangeRatesForPage,
-  GOLD_NISAB_GRAMS,
-  SILVER_NISAB_GRAMS,
-} from "@/lib/nisab";
+  NISAB_STANDARDS,
+  defaultStandardFor,
+  nisabAmounts,
+} from "@/lib/nisab-standards";
 import { COUNTRIES } from "@/lib/countries";
 import { formatMoney } from "@/lib/currencies";
 import { OG_IMAGE } from "@/lib/site";
@@ -15,7 +15,7 @@ import { PricesUnavailable } from "@/components/ui/PricesUnavailable";
 export const revalidate = 3600;
 
 const title = "Nisab Today in Every Currency";
-const description = `Today's Zakat Nisab in ${COUNTRIES.length} countries and currencies: the silver Nisab (${SILVER_NISAB_GRAMS} g) and gold Nisab (${GOLD_NISAB_GRAMS} g) at live prices, updated daily.`;
+const description = `Today's Zakat Nisab in ${COUNTRIES.length} countries and currencies: the silver and gold Nisab at live prices, updated daily.`;
 
 export const metadata: Metadata = {
   title: `${title} | Nisab Tracker`,
@@ -77,6 +77,8 @@ export default async function NisabByCountryPage() {
           <tbody className="divide-y divide-stone-100">
             {COUNTRIES.map((country) => {
               const rate = rates[country.currency];
+              const standardId = defaultStandardFor(country.currency);
+              const nisabUSD = nisabAmounts(nisab, standardId);
               return (
                 <tr key={country.slug} className="hover:bg-stone-50">
                   <td className="px-4 py-3">
@@ -86,15 +88,24 @@ export default async function NisabByCountryPage() {
                     >
                       {country.name}
                     </Link>
+                    {standardId === "hanafi" && (
+                      <span
+                        className="text-stone-400"
+                        title="Hanafi / tola weights"
+                      >
+                        {" "}
+                        *
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-right text-stone-900 whitespace-nowrap">
                     {rate
-                      ? formatMoney(nisab.nisabSilver * rate, country.currency)
+                      ? formatMoney(nisabUSD.silver * rate, country.currency)
                       : "–"}
                   </td>
                   <td className="px-4 py-3 text-right text-stone-900 whitespace-nowrap">
                     {rate
-                      ? formatMoney(nisab.nisabGold * rate, country.currency)
+                      ? formatMoney(nisabUSD.gold * rate, country.currency)
                       : "–"}
                   </td>
                 </tr>
@@ -104,9 +115,12 @@ export default async function NisabByCountryPage() {
         </table>
       </div>
       <p className="text-xs text-stone-500 mt-2">
-        Silver Nisab = {SILVER_NISAB_GRAMS} g of silver; gold Nisab ={" "}
-        {GOLD_NISAB_GRAMS} g of gold. Converted from USD spot prices at
-        today&apos;s exchange rates.
+        Based on {NISAB_STANDARDS.majority.silverGrams} g of silver and{" "}
+        {NISAB_STANDARDS.majority.goldGrams} g of gold (AAOIFI and most
+        scholars). * Uses the Hanafi tola weights common in South Asia:{" "}
+        {NISAB_STANDARDS.hanafi.silverGrams} g of silver and{" "}
+        {NISAB_STANDARDS.hanafi.goldGrams} g of gold. Converted from USD spot
+        prices at today&apos;s exchange rates.
       </p>
     </main>
   );

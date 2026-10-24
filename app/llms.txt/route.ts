@@ -1,9 +1,10 @@
 import { getAllPosts } from "@/lib/blog";
+import { getNisabValues } from "@/lib/nisab";
 import {
-  getNisabValues,
-  GOLD_NISAB_GRAMS,
-  SILVER_NISAB_GRAMS,
-} from "@/lib/nisab";
+  NISAB_STANDARDS,
+  STANDARDS_EXPLAINER,
+  nisabAmounts,
+} from "@/lib/nisab-standards";
 import { SITE_URL, AUTHOR } from "@/lib/site";
 import { COUNTRIES, countryInName } from "@/lib/countries";
 
@@ -13,6 +14,8 @@ export const revalidate = 3600;
 const usd = (amount: number) =>
   amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
 
+const { majority, hanafi } = NISAB_STANDARDS;
+
 export async function GET() {
   const nisab = await getNisabValues();
   const posts = getAllPosts();
@@ -21,8 +24,8 @@ export async function GET() {
     ? `
 ## Today's Nisab (USD)
 
-- Gold Nisab (${GOLD_NISAB_GRAMS} g of gold): ${usd(nisab.nisabGold)}
-- Silver Nisab (${SILVER_NISAB_GRAMS} g of silver): ${usd(nisab.nisabSilver)}
+- Silver Nisab: ${usd(nisabAmounts(nisab, "majority").silver)} (${majority.silverGrams} g, AAOIFI and most scholars) or ${usd(nisabAmounts(nisab, "hanafi").silver)} (${hanafi.silverGrams} g, Hanafi / tola)
+- Gold Nisab: ${usd(nisabAmounts(nisab, "majority").gold)} (${majority.goldGrams} g) or ${usd(nisabAmounts(nisab, "hanafi").gold)} (${hanafi.goldGrams} g, Hanafi / tola)
 - Gold: ${usd(nisab.goldPricePerGram)} per gram; silver: ${usd(nisab.silverPricePerGram)} per gram
 - Prices as of ${nisab.lastUpdated.split("T")[0]}
 
@@ -38,8 +41,8 @@ Gold and silver prices are refreshed daily from international spot price provide
 ${todaysValues}
 ## How the numbers are calculated
 
-- Gold Nisab = ${GOLD_NISAB_GRAMS} g × the spot price of pure gold per gram
-- Silver Nisab = ${SILVER_NISAB_GRAMS} g × the spot price of silver per gram
+- ${STANDARDS_EXPLAINER}
+- Nisab = those grams × the spot price per gram. The site defaults to ${majority.goldGrams} g / ${majority.silverGrams} g, and to ${hanafi.goldGrams} g / ${hanafi.silverGrams} g for Pakistan, India and Bangladesh; users can switch.
 - Zakat is due at 2.5% of net zakatable wealth (assets minus debts) that has stayed at or above the chosen Nisab for one lunar year (hawl)
 - Many scholars recommend the silver Nisab because it is lower and so benefits more people in need
 
