@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getNisabValuesForPage, getExchangeRatesForPage } from "@/lib/nisab";
 import {
-  getNisabValuesForPage,
-  getExchangeRatesForPage,
-  GOLD_NISAB_GRAMS,
-  SILVER_NISAB_GRAMS,
-} from "@/lib/nisab";
+  NISAB_STANDARDS,
+  defaultStandardFor,
+  nisabAmounts,
+} from "@/lib/nisab-standards";
 import {
   COUNTRIES,
   TOLA_GRAMS,
@@ -99,20 +99,30 @@ export default async function CountryNisabPage({ params }: CountryPageProps) {
   const inName = countryInName(country);
   const money = (usd: number) => formatMoney(usd * rate, code);
 
-  const silverNisab = money(nisab.nisabSilver);
-  const goldNisab = money(nisab.nisabGold);
+  const standardId = defaultStandardFor(code);
+  const standard = NISAB_STANDARDS[standardId];
+  const nisabUSD = nisabAmounts(nisab, standardId);
+  const otherStandard =
+    NISAB_STANDARDS[standardId === "majority" ? "hanafi" : "majority"];
+  const otherNisabUSD = nisabAmounts(
+    nisab,
+    standardId === "majority" ? "hanafi" : "majority"
+  );
+
+  const silverNisab = money(nisabUSD.silver);
+  const goldNisab = money(nisabUSD.gold);
   const updatedOn = new Date(nisab.lastUpdated).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",
     timeZone: "UTC",
   });
-  const example = exampleAmount(nisab.nisabSilver * rate);
+  const example = exampleAmount(nisabUSD.silver * rate);
 
   const faqs = [
     {
       question: `What is the Nisab in ${inName} today?`,
-      answer: `As of ${updatedOn}, the silver Nisab is ${silverNisab} and the gold Nisab is ${goldNisab}. These are the values of ${SILVER_NISAB_GRAMS} g of silver and ${GOLD_NISAB_GRAMS} g of gold at today's prices.`,
+      answer: `As of ${updatedOn}, the silver Nisab is ${silverNisab} and the gold Nisab is ${goldNisab}. These are the values of ${standard.silverGrams} g of silver and ${standard.goldGrams} g of gold at today's prices.`,
     },
     {
       question: `How much Zakat do I pay in ${inName}?`,
@@ -123,11 +133,15 @@ export default async function CountryNisabPage({ params }: CountryPageProps) {
       answer:
         "Scholars differ. Many recommend the silver Nisab because it is lower, so more people pay Zakat and more of the poor benefit. Others use the gold Nisab, especially when most of your wealth is held in gold. If you're unsure, follow a scholar you trust.",
     },
+    {
+      question: `Why do some sites show a different Nisab?`,
+      answer: `Scholars convert the 20 dinars of gold and 200 dirhams of silver to grams using slightly different coin weights. This page uses ${standard.goldGrams} g of gold and ${standard.silverGrams} g of silver (${standard.description}). Using ${otherStandard.goldGrams} g / ${otherStandard.silverGrams} g (${otherStandard.description}) instead, the silver Nisab is ${money(otherNisabUSD.silver)} and the gold Nisab is ${money(otherNisabUSD.gold)}. Both are valid, so follow the one your scholar uses. You can switch between them in the Zakat calculator.`,
+    },
     ...(country.usesTola
       ? [
           {
             question: "What is the Nisab in tola?",
-            answer: `The gold Nisab is 7.5 tola (${GOLD_NISAB_GRAMS} g), worth ${goldNisab} today, and the silver Nisab is 52.5 tola (${SILVER_NISAB_GRAMS} g), worth ${silverNisab}.`,
+            answer: `The gold Nisab is 7.5 tola (${standard.goldGrams} g), worth ${goldNisab} today, and the silver Nisab is 52.5 tola (${standard.silverGrams} g), worth ${silverNisab}.`,
           },
         ]
       : []),
@@ -170,9 +184,9 @@ export default async function CountryNisabPage({ params }: CountryPageProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
         <NisabCard
           title="Silver Nisab"
-          value={formatAmount(nisab.nisabSilver * rate)}
+          value={formatAmount(nisabUSD.silver * rate)}
           currency={code}
-          description={`${SILVER_NISAB_GRAMS} grams of silver`}
+          description={`${standard.silverGrams} grams of silver`}
           lastUpdated={updatedOn}
           featured={true}
           change={formatChange(nisab.silverPriceChange)}
@@ -180,9 +194,9 @@ export default async function CountryNisabPage({ params }: CountryPageProps) {
         />
         <NisabCard
           title="Gold Nisab"
-          value={formatAmount(nisab.nisabGold * rate)}
+          value={formatAmount(nisabUSD.gold * rate)}
           currency={code}
-          description={`${GOLD_NISAB_GRAMS} grams of gold`}
+          description={`${standard.goldGrams} grams of gold`}
           lastUpdated={updatedOn}
           featured={true}
           change={formatChange(nisab.goldPriceChange)}
@@ -192,7 +206,7 @@ export default async function CountryNisabPage({ params }: CountryPageProps) {
 
       <div className="text-center mb-16">
         <Link href="/zakat-calculator">
-          <Button size="lg" className="px-8">
+          <Button size="lg" className="px-8 cursor-pointer">
             🧮 Calculate your Zakat in {currency.name}
           </Button>
         </Link>
@@ -258,12 +272,12 @@ export default async function CountryNisabPage({ params }: CountryPageProps) {
         <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-5 space-y-2 text-stone-700">
           <p>
             <span className="font-semibold">Silver Nisab</span> ={" "}
-            {SILVER_NISAB_GRAMS} g × {money(nisab.silverPricePerGram)} ={" "}
+            {standard.silverGrams} g × {money(nisab.silverPricePerGram)} ={" "}
             <span className="font-semibold">{silverNisab}</span>
           </p>
           <p>
             <span className="font-semibold">Gold Nisab</span> ={" "}
-            {GOLD_NISAB_GRAMS} g × {money(nisab.goldPricePerGram)} ={" "}
+            {standard.goldGrams} g × {money(nisab.goldPricePerGram)} ={" "}
             <span className="font-semibold">{goldNisab}</span>
           </p>
           <p className="text-sm text-stone-600 pt-2">

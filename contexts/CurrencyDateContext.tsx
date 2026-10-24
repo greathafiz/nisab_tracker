@@ -23,6 +23,10 @@ import React, {
  */
 
 import { currencies, type Currency, type CurrencyCode } from "@/lib/currencies";
+import {
+  defaultStandardFor,
+  type NisabStandardId,
+} from "@/lib/nisab-standards";
 
 function getHijriDate() {
   const formatter = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", {
@@ -154,6 +158,9 @@ interface CurrencyDateContextType {
   convertFromUSD: (amount: number) => number;
   // True when rates failed to load, so a non-USD selection is being shown in USD
   ratesUnavailable: boolean;
+  // Gram weights for the Nisab: the visitor's choice, or the norm for their currency
+  nisabStandard: NisabStandardId;
+  setNisabStandard: (standard: NisabStandardId) => void;
   hijriDate: string;
   gregorianDate: string;
 }
@@ -170,6 +177,10 @@ export function CurrencyDateProvider({ children }: { children: ReactNode }) {
     () => "USD"
   );
   const currencyCode = selectedCode ?? detectedCode;
+
+  const [selectedStandard, setSelectedStandard] =
+    useState<NisabStandardId | null>(null);
+  const nisabStandard = selectedStandard ?? defaultStandardFor(currencyCode);
 
   const hijriDate = useSyncExternalStore(
     subscribeToClock,
@@ -211,6 +222,8 @@ export function CurrencyDateProvider({ children }: { children: ReactNode }) {
     displayCurrency: rate ? currencies[currencyCode] : currencies.USD,
     convertFromUSD: (amount) => amount * (rate ?? 1),
     ratesUnavailable: !rate && !isLoadingRates,
+    nisabStandard,
+    setNisabStandard: setSelectedStandard,
     hijriDate,
     gregorianDate,
   };

@@ -6,18 +6,22 @@ import { HeroSection } from "@/components/homepage/HeroSection";
 import { ZakatSection } from "@/components/homepage/ZakatSection";
 import { PricesNotice } from "@/components/ui/PricesNotice";
 import { CountryLinks } from "@/components/nisab/CountryLinks";
+import { NisabStandardToggle } from "@/components/ui/NisabStandardToggle";
 import type { NisabValues } from "@/lib/nisab";
+import { NISAB_STANDARDS, nisabAmounts } from "@/lib/nisab-standards";
 
 interface HomePageWrapperProps {
   initialData: NisabValues;
 }
 
 export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
-  const { displayCurrency, convertFromUSD } = useCurrencyDate();
+  const { displayCurrency, convertFromUSD, nisabStandard } = useCurrencyDate();
+  const standard = NISAB_STANDARDS[nisabStandard];
+  const nisab = nisabAmounts(initialData, nisabStandard);
 
   // Convert usd data locally using exchange rate
-  const nisabGoldVal = convertFromUSD(initialData.nisabGold);
-  const nisabSilverVal = convertFromUSD(initialData.nisabSilver);
+  const nisabGoldVal = convertFromUSD(nisab.gold);
+  const nisabSilverVal = convertFromUSD(nisab.silver);
   const goldPricePerGramVal = convertFromUSD(initialData.goldPricePerGram);
   const silverPricePerGramVal = convertFromUSD(initialData.silverPricePerGram);
 
@@ -51,7 +55,7 @@ export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
           title="Nisab (Gold)"
           value={nisabGold}
           currency={displayCurrency.code}
-          description="87.48 grams of gold"
+          description={`${standard.goldGrams} grams of gold`}
           lastUpdated={lastUpdated}
           featured={true}
           change={goldPriceChange}
@@ -61,13 +65,15 @@ export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
           title="Nisab (Silver)"
           value={nisabSilver}
           currency={displayCurrency.code}
-          description="612.36 grams of silver"
+          description={`${standard.silverGrams} grams of silver`}
           lastUpdated={lastUpdated}
           featured={true}
           change={silverPriceChange}
           icon="🥈"
         />
       </div>
+
+      <NisabStandardToggle className="-mt-8 mb-16 text-center" />
 
       <section className="mb-16 text-center">
         <h2 className="text-xl font-semibold text-stone-900 mb-4">

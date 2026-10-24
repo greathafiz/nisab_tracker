@@ -5,13 +5,10 @@ import type { CurrencyCode } from "@/lib/currencies";
 import { isOlderThan } from "@/lib/utils";
 
 /**
- * Nisab values in USD; pages convert them to the visitor's currency client-side
+ * Metal prices in USD per gram. Nisab amounts depend on the weight standard, so pages
+ * derive them with nisabAmounts() from lib/nisab-standards.ts.
  */
 export interface NisabValues {
-  nisabGold: number;
-  nisabSilver: number;
-  dowry: number;
-  diyyah: number;
   lastUpdated: string;
   // True when prices haven't been refreshed for a while, i.e. the daily update is failing
   isStale: boolean;
@@ -20,11 +17,6 @@ export interface NisabValues {
   goldPricePerGram: number;
   silverPricePerGram: number;
 }
-
-export const GOLD_NISAB_GRAMS = 87.48;
-export const SILVER_NISAB_GRAMS = 612.36;
-const MAHR_AL_FATIMAH_GRAMS = 1487.5; // 500 dirhams × 2.975g
-const DIYYAH_GOLD_GRAMS = 4374; // Approximately 1000 dinars
 
 const STALE_AFTER_MS = 48 * 60 * 60 * 1000;
 
@@ -40,10 +32,6 @@ export async function getNisabValues(): Promise<NisabValues | null> {
     const { goldPricePerGram, silverPricePerGram } = priceCache;
 
     return {
-      nisabGold: Number((goldPricePerGram * GOLD_NISAB_GRAMS).toFixed(2)),
-      nisabSilver: Number((silverPricePerGram * SILVER_NISAB_GRAMS).toFixed(2)),
-      dowry: Number((silverPricePerGram * MAHR_AL_FATIMAH_GRAMS).toFixed(2)),
-      diyyah: Number((goldPricePerGram * DIYYAH_GOLD_GRAMS).toFixed(2)),
       lastUpdated: priceCache.lastUpdated,
       isStale: isOlderThan(
         priceCache.fetchedAt ?? priceCache.lastUpdated,

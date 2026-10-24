@@ -4,6 +4,7 @@ import { useCurrencyDate } from "@/contexts/CurrencyDateContext";
 import { formatLastUpdated } from "@/lib/format-time";
 import { trackEvent } from "@/lib/analytics";
 import type { NisabValues } from "@/lib/nisab";
+import { nisabAmounts } from "@/lib/nisab-standards";
 import { Button } from "@/components/ui/shadcn/button";
 import { PricesNotice } from "@/components/ui/PricesNotice";
 import {
@@ -40,14 +41,15 @@ interface ZakatCalculatorProps {
 }
 
 export function ZakatCalculator({ nisab }: ZakatCalculatorProps) {
-  const { displayCurrency, convertFromUSD } = useCurrencyDate();
+  const { displayCurrency, convertFromUSD, nisabStandard } = useCurrencyDate();
+  const nisabUSD = nisabAmounts(nisab, nisabStandard);
   const [wealthData, setWealthData] =
     useState<WealthDataWithDebts>(EMPTY_WEALTH_DATA);
   const [nisabType, setNisabType] = useState<NisabType>("silver");
   const [goldKarat, setGoldKarat] = useState<GoldKarat>(24);
 
-  const nisabGold = convertFromUSD(nisab.nisabGold);
-  const nisabSilver = convertFromUSD(nisab.nisabSilver);
+  const nisabGold = convertFromUSD(nisabUSD.gold);
+  const nisabSilver = convertFromUSD(nisabUSD.silver);
   const goldPricePerGram = convertFromUSD(
     nisab.goldPricePerGram * (goldKarat / 24)
   );
@@ -190,7 +192,7 @@ export function ZakatCalculator({ nisab }: ZakatCalculatorProps) {
             <Button
               onClick={resetCalculator}
               variant="outline"
-              className="flex-1"
+              className="flex-1 cursor-pointer"
             >
               Reset Calculator
             </Button>

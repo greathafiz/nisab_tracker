@@ -1,22 +1,23 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/shadcn/button"
-import { Badge } from "@/components/ui/shadcn/badge"
+import { Button } from "@/components/ui/shadcn/button";
+import { Badge } from "@/components/ui/shadcn/badge";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/shadcn/card"
+} from "@/components/ui/shadcn/card";
+import { NisabStandardToggle } from "@/components/ui/NisabStandardToggle";
 
-export type NisabType = "silver" | "gold"
+export type NisabType = "silver" | "gold";
 
 interface NisabThresholdSelectorProps {
-  nisabType: NisabType
-  onNisabTypeChange: (type: NisabType) => void
-  silverNisab: number
-  goldNisab: number
-  formatCurrency: (amount: number) => string
+  nisabType: NisabType;
+  onNisabTypeChange: (type: NisabType) => void;
+  silverNisab: number;
+  goldNisab: number;
+  formatCurrency: (amount: number) => string;
 }
 
 export function NisabThresholdSelector({
@@ -45,7 +46,10 @@ export function NisabThresholdSelector({
           >
             <div className="flex items-center justify-between w-full gap-3">
               <span className="font-medium">Silver Nisab</span>
-              <Badge variant="secondary" className="text-xs whitespace-nowrap">
+              <Badge
+                variant="secondary"
+                className="text-xs whitespace-nowrap cursor-pointer"
+              >
                 {formatCurrency(silverNisab)}
               </Badge>
             </div>
@@ -57,7 +61,10 @@ export function NisabThresholdSelector({
           >
             <div className="flex items-center justify-between w-full gap-3">
               <span className="font-medium">Gold Nisab</span>
-              <Badge variant="secondary" className="text-xs whitespace-nowrap">
+              <Badge
+                variant="secondary"
+                className="text-xs whitespace-nowrap cursor-pointer"
+              >
                 {formatCurrency(goldNisab)}
               </Badge>
             </div>
@@ -67,7 +74,13 @@ export function NisabThresholdSelector({
           Silver threshold is typically lower, making more people eligible for
           Zakat
         </p>
+        <div className="mt-4 pt-4 border-t border-stone-100">
+          <p className="text-sm font-medium text-stone-700 mb-2">
+            Weight standard
+          </p>
+          <NisabStandardToggle />
+        </div>
       </CardContent>
     </Card>
-  )
+  );
 }
