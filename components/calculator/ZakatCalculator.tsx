@@ -1,7 +1,8 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useCurrencyDate } from "@/contexts/CurrencyDateContext";
 import { formatLastUpdated } from "@/lib/format-time";
+import { trackEvent } from "@/lib/analytics";
 import type { NisabValues } from "@/lib/nisab";
 import { Button } from "@/components/ui/shadcn/button";
 import { PricesNotice } from "@/components/ui/PricesNotice";
@@ -9,7 +10,11 @@ import {
   NisabThresholdSelector,
   type NisabType,
 } from "./NisabThresholdSelector";
-import { WealthInputForm, type WealthData } from "./WealthInputForm";
+import {
+  WealthInputForm,
+  type WealthData,
+  type GoldKarat,
+} from "./WealthInputForm";
 import { DebtInputForm } from "./DebtInputForm";
 import { FutureCategoriesCard } from "./FutureCategoriesCard";
 import {
@@ -39,17 +44,28 @@ export function ZakatCalculator({ nisab }: ZakatCalculatorProps) {
   const [wealthData, setWealthData] =
     useState<WealthDataWithDebts>(EMPTY_WEALTH_DATA);
   const [nisabType, setNisabType] = useState<NisabType>("silver");
+  const [goldKarat, setGoldKarat] = useState<GoldKarat>(24);
 
   const nisabGold = convertFromUSD(nisab.nisabGold);
   const nisabSilver = convertFromUSD(nisab.nisabSilver);
-  const goldPricePerGram = convertFromUSD(nisab.goldPricePerGram);
+  const goldPricePerGram = convertFromUSD(
+    nisab.goldPricePerGram * (goldKarat / 24)
+  );
   const silverPricePerGram = convertFromUSD(nisab.silverPricePerGram);
+
+  // Each analytics event is sent at most once per visit to the page
+  const hasTrackedStart = useRef(false);
+  const hasTrackedZakatDue = useRef(false);
 
   const handleInputChange = (
     field: keyof WealthDataWithDebts,
     value: string
   ) => {
     const sanitizedValue = value.replace(/[^0-9.]/g, "");
+    if (sanitizedValue && !hasTrackedStart.current) {
+      hasTrackedStart.current = true;
+      trackEvent({ name: "calculator_start" });
+    }
     setWealthData((prev) => ({
       ...prev,
       [field]: sanitizedValue,
@@ -106,6 +122,19 @@ export function ZakatCalculator({ nisab }: ZakatCalculatorProps) {
     silverPricePerGram,
   ]);
 
+  const isZakatDue = results?.isEligible ?? false;
+  useEffect(() => {
+    if (!isZakatDue || hasTrackedZakatDue.current) return;
+    hasTrackedZakatDue.current = true;
+    trackEvent({
+      name: "zakat_due_shown",
+      params: {
+        nisab_type: nisabType,
+        selected_currency: displayCurrency.code,
+      },
+    });
+  }, [isZakatDue, nisabType, displayCurrency.code]);
+
   const resetCalculator = () => {
     setWealthData(EMPTY_WEALTH_DATA);
   };
@@ -140,6 +169,8 @@ export function ZakatCalculator({ nisab }: ZakatCalculatorProps) {
           <WealthInputForm
             wealthData={wealthData}
             onInputChange={handleWealthInputChange}
+            goldKarat={goldKarat}
+            onGoldKaratChange={setGoldKarat}
             goldPricePerGram={goldPricePerGram}
             silverPricePerGram={silverPricePerGram}
             formatCurrency={formatCurrency}

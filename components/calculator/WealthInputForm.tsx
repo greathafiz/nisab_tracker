@@ -1,34 +1,44 @@
-"use client"
+"use client";
 
-import { Input } from "@/components/ui/shadcn/input"
-import { Label } from "@/components/ui/shadcn/label"
+import { Input } from "@/components/ui/shadcn/input";
+import { Label } from "@/components/ui/shadcn/label";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/shadcn/card"
+} from "@/components/ui/shadcn/card";
 
 export interface WealthData {
-  cash: string
-  goldWeight: string
-  silverWeight: string
-  investments: string
-  businessAssets: string
+  cash: string;
+  goldWeight: string;
+  silverWeight: string;
+  investments: string;
+  businessAssets: string;
 }
 
+// Prices are for pure (24k) gold; a karat-K item is K/24 gold by weight
+export const GOLD_KARATS = [24, 22, 21, 18, 14] as const;
+
+export type GoldKarat = (typeof GOLD_KARATS)[number];
+
 interface WealthInputFormProps {
-  wealthData: WealthData
-  onInputChange: (field: keyof WealthData, value: string) => void
-  goldPricePerGram: number
-  silverPricePerGram: number
-  formatCurrency: (amount: number) => string
-  totalAssets: number
+  wealthData: WealthData;
+  onInputChange: (field: keyof WealthData, value: string) => void;
+  goldKarat: GoldKarat;
+  onGoldKaratChange: (karat: GoldKarat) => void;
+  // Price per gram of gold at the selected karat
+  goldPricePerGram: number;
+  silverPricePerGram: number;
+  formatCurrency: (amount: number) => string;
+  totalAssets: number;
 }
 
 export function WealthInputForm({
   wealthData,
   onInputChange,
+  goldKarat,
+  onGoldKaratChange,
   goldPricePerGram,
   silverPricePerGram,
   formatCurrency,
@@ -63,18 +73,38 @@ export function WealthInputForm({
 
           <div className="space-y-2">
             <Label htmlFor="goldWeight">Gold (grams)</Label>
-            <Input
-              id="goldWeight"
-              placeholder="0.00"
-              value={wealthData.goldWeight}
-              onChange={(e) => onInputChange("goldWeight", e.target.value)}
-            />
-            {wealthData.goldWeight && (
+            <div className="flex gap-2">
+              <Input
+                id="goldWeight"
+                placeholder="0.00"
+                value={wealthData.goldWeight}
+                onChange={(e) => onInputChange("goldWeight", e.target.value)}
+              />
+              <select
+                aria-label="Gold purity"
+                value={goldKarat}
+                onChange={(e) =>
+                  onGoldKaratChange(Number(e.target.value) as GoldKarat)
+                }
+                className="h-9 rounded-md border border-input bg-transparent px-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              >
+                {GOLD_KARATS.map((karat) => (
+                  <option key={karat} value={karat}>
+                    {karat}k
+                  </option>
+                ))}
+              </select>
+            </div>
+            {wealthData.goldWeight ? (
               <p className="text-xs text-stone-500 mt-1">
                 ≈{" "}
                 {formatCurrency(
                   parseFloat(wealthData.goldWeight) * goldPricePerGram
                 )}
+              </p>
+            ) : (
+              <p className="text-xs text-stone-500 mt-1">
+                Most jewellery is 18k–22k. Check the stamp if unsure.
               </p>
             )}
           </div>
@@ -118,5 +148,5 @@ export function WealthInputForm({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
