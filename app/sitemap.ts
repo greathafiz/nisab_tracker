@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllPosts } from "@/lib/blog";
 import { SITE_URL } from "@/lib/site";
+import { COUNTRIES } from "@/lib/countries";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getAllPosts();
@@ -23,6 +24,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    {
+      url: `${SITE_URL}/nisab`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    ...COUNTRIES.map((country) => ({
+      url: `${SITE_URL}/nisab/${country.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.8,
+    })),
     {
       url: `${SITE_URL}/blog`,
       lastModified: latestPostDate ? new Date(latestPostDate) : undefined,

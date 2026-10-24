@@ -1,5 +1,7 @@
 import { PHASE_PRODUCTION_BUILD } from "next/constants";
 import { getCurrentMetalPrices } from "@/lib/redis/metals-cache";
+import { getCachedExchangeRates } from "@/lib/redis/exchange-rates-cache";
+import type { CurrencyCode } from "@/lib/currencies";
 import { isOlderThan } from "@/lib/utils";
 
 /**
@@ -66,9 +68,26 @@ export async function getNisabValues(): Promise<NisabValues | null> {
  * During the build it returns null so the page can render its fallback.
  */
 export async function getNisabValuesForPage(): Promise<NisabValues | null> {
-  const values = await getNisabValues();
-  if (!values && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) {
-    throw new Error("Nisab values are unavailable");
+  return orThrowAfterBuild(await getNisabValues(), "Nisab values");
+}
+
+/**
+ * USD exchange rates for rendering a page, with the same failure handling as
+ * getNisabValuesForPage
+ */
+export async function getExchangeRatesForPage(): Promise<Partial<
+  Record<CurrencyCode, number>
+> | null> {
+  const cache = await getCachedExchangeRates();
+  return orThrowAfterBuild(
+    cache && { ...cache.rates, USD: 1 },
+    "Exchange rates"
+  );
+}
+
+function orThrowAfterBuild<T>(value: T | null, what: string): T | null {
+  if (!value && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) {
+    throw new Error(`${what} are unavailable`);
   }
-  return values;
+  return value;
 }

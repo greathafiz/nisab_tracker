@@ -40,6 +40,11 @@ export const Footer = () => {
                   Zakat Calculator
                 </Link>
               </li>
+              <li>
+                <Link href="/nisab" className={linkClassName}>
+                  Nisab by Country
+                </Link>
+              </li>
             </ul>
           </div>
 

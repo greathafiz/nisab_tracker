@@ -5,6 +5,7 @@ import { NisabCard } from "@/components/homepage/NisabCard";
 import { HeroSection } from "@/components/homepage/HeroSection";
 import { ZakatSection } from "@/components/homepage/ZakatSection";
 import { PricesNotice } from "@/components/ui/PricesNotice";
+import { CountryLinks } from "@/components/nisab/CountryLinks";
 import type { NisabValues } from "@/lib/nisab";
 
 interface HomePageWrapperProps {
@@ -67,6 +68,14 @@ export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
           icon="🥈"
         />
       </div>
+
+      <section className="mb-16 text-center">
+        <h2 className="text-xl font-semibold text-stone-900 mb-4">
+          Nisab in your country
+        </h2>
+        <CountryLinks className="justify-center max-w-3xl mx-auto" />
+      </section>
+
       <ZakatSection />
     </main>
   );

@@ -5,6 +5,7 @@ import {
   SILVER_NISAB_GRAMS,
 } from "@/lib/nisab";
 import { SITE_URL, AUTHOR } from "@/lib/site";
+import { COUNTRIES, countryInName } from "@/lib/countries";
 
 // llms.txt (https://llmstxt.org): a plain-Markdown summary of the site for AI assistants
 export const revalidate = 3600;
@@ -46,6 +47,13 @@ ${todaysValues}
 
 - [Today's Nisab](${SITE_URL}/): live gold and silver Nisab values in 20 currencies
 - [Zakat Calculator](${SITE_URL}/zakat-calculator): enter cash, gold (by karat), silver, investments, business assets and debts to see whether Zakat is due and how much
+- [Nisab by country](${SITE_URL}/nisab): today's Nisab in every supported currency
+
+## Nisab by country
+
+Each page shows the day's silver and gold Nisab in the local currency, gold prices per gram by karat, and a worked Zakat example.
+
+${COUNTRIES.map((country) => `- [Nisab in ${countryInName(country)} (${country.currency})](${SITE_URL}/nisab/${country.slug})`).join("\n")}
 
 ## Guides
 

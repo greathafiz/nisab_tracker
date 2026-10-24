@@ -1,11 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { Badge } from "../ui/shadcn/badge";
-import {
-  useCurrencyDate,
-  currencies,
-  type CurrencyCode,
-} from "../../contexts/CurrencyDateContext";
+import { useCurrencyDate } from "../../contexts/CurrencyDateContext";
+import { currencies, type CurrencyCode } from "@/lib/currencies";
 import Link from "next/link";
 import Image from "next/image";
 import { trackEvent } from "@/lib/analytics";
