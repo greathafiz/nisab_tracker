@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nisab Tracker
 
-## Getting Started
+Live gold and silver Nisab values in 20 currencies, plus a free Zakat calculator and a small blog. Live at [nisabtracker.com](https://www.nisabtracker.com).
 
-First, run the development server:
+Next.js (App Router) on Vercel, with Redis as a cache for prices and exchange rates.
+
+## How the data flows
+
+1. **Daily cron** (`vercel.json`, 02:00 UTC) calls `/api/cron/daily-update`, which fetches:
+   - metal prices: metalpriceapi.com, falling back to goldapi.io, then islamicapi.com
+   - USD exchange rates: exchangerate-api.com
+2. Both are stored in Redis. A failed fetch never overwrites the last good data.
+3. Pages read from Redis. If an entry is more than a day old (the cron failed), a page request retries the fetch, **at most once an hour**, so free-tier API quotas aren't burned. Otherwise the stale data is served, and the UI shows a warning once prices are over 48h old.
+4. Everything is stored in USD. The browser converts to the visitor's currency using `/api/exchange-rates`; if rates are unavailable, values are shown in USD with a notice.
+
+The homepage and calculator use ISR (`revalidate = 3600`). If data is unavailable during a revalidation, the page throws so Vercel keeps serving the last good version.
+
+## Environment variables
+
+Set these in Vercel (and in `.env.local` to run locally):
+
+| Variable                    | Used for                                                                      |
+| --------------------------- | ----------------------------------------------------------------------------- |
+| `STORAGE_REDIS_URL`         | Redis connection string                                                       |
+| `METALPRICEAPI_API_KEY`     | Primary metal price source (free tier: 100 req/month)                         |
+| `GOLDAPI_IO_API_KEY`        | Fallback metal price source                                                   |
+| `ISLAMICAPI_API_KEY`        | Second fallback metal price source                                            |
+| `EXCHANGERATEAPI_API_KEY`   | Exchange rates                                                                |
+| `CRON_SECRET`               | Vercel sends it as a Bearer token to authorize the cron route                 |
+| `GOOGLE_SHEETS_WEB_APP_URL` | Apps Script endpoint that stores Zakat reminder waitlist emails               |
+| `NEXT_PUBLIC_APP_URL`       | Optional; base URL for client-side API calls (defaults to the current origin) |
+
+With the Vercel CLI linked to the project, `vercel env pull .env.local` fetches them.
+
+## Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # needs STORAGE_REDIS_URL for real data
+npm run lint
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Without `STORAGE_REDIS_URL`, the build still succeeds but prerenders the "failed to load" state; that's expected locally, since Vercel builds with the real variables.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The pre-commit hook (Husky + lint-staged) runs ESLint and Prettier on staged files, then a full build.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Blog
 
-## Learn More
+Posts are Markdown files in `app/blog/_content/` with frontmatter (title, description, dates, keywords, FAQs). New posts appear on `/blog` and in the sitemap automatically.
 
-To learn more about Next.js, take a look at the following resources:
+## Monitoring
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Failed cron runs return HTTP 500 and show up as errors under the project's **Cron Jobs** tab in Vercel.
+- Google Analytics: `G-S08RYTFS3W`. Vercel Speed Insights is enabled.

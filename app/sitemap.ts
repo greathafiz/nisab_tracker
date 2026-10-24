@@ -1,38 +1,39 @@
 import type { MetadataRoute } from "next";
+import { getAllPosts } from "@/lib/blog";
+import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const domain = "https://www.nisabtracker.com";
+  const posts = getAllPosts();
+  const latestPostDate = posts
+    .map((post) => post.updatedAt || post.publishedAt)
+    .sort()
+    .at(-1);
 
   return [
     {
-      url: domain,
+      url: SITE_URL,
+      // Prices change daily
       lastModified: new Date(),
-      changeFrequency: "monthly",
+      changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: `${domain}/zakat-calculator`,
+      url: `${SITE_URL}/zakat-calculator`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
+      changeFrequency: "daily",
+      priority: 0.9,
     },
     {
-      url: `${domain}/blog`,
-      lastModified: new Date(),
+      url: `${SITE_URL}/blog`,
+      lastModified: latestPostDate ? new Date(latestPostDate) : undefined,
       changeFrequency: "weekly",
       priority: 0.8,
     },
-    {
-      url: `${domain}/blog/what-is-nisab-in-islam`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${domain}/blog/zakat-vs-zakat-al-fitr`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
+    ...posts.map((post) => ({
+      url: `${SITE_URL}/blog/${post.slug}`,
+      lastModified: new Date(post.updatedAt || post.publishedAt),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
   ];
 }

@@ -7,6 +7,7 @@ import {
   FAQPage,
   BreadcrumbList,
 } from "schema-dts";
+import { SITE_URL } from "./site";
 
 /**
  * Generate WebApplication schema for the Nisab Tracker
@@ -20,7 +21,7 @@ export function generateWebApplicationSchema(): WithContext<WebApplication> {
     applicationCategory: "FinanceApplication",
     description:
       "Free Islamic Zakat calculator that tracks Nisab values based on current gold and silver prices. Calculate your Zakat obligation accurately with real-time precious metal prices.",
-    url: "https://nisabtracker.com",
+    url: SITE_URL,
     operatingSystem: "Any",
     browserRequirements: "Requires JavaScript. Requires HTML5.",
     offers: {
@@ -46,10 +47,10 @@ export function generateOrganizationSchema(): WithContext<Organization> {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Nisab Tracker",
-    url: "https://nisabtracker.com",
+    url: SITE_URL,
     logo: {
       "@type": "ImageObject",
-      url: "https://nisabtracker.com/logo-192.png",
+      url: `${SITE_URL}/logo-192.png`,
       width: "192",
       height: "192",
     },
@@ -81,13 +82,13 @@ export function generateWebPageSchema(
     publisher: {
       "@type": "Organization",
       name: "Nisab Tracker",
-      url: "https://nisabtracker.com",
+      url: SITE_URL,
     },
     inLanguage: "en-US",
     isPartOf: {
       "@type": "WebSite",
       name: "Nisab Tracker",
-      url: "https://nisabtracker.com",
+      url: SITE_URL,
     },
   };
 }
@@ -131,7 +132,7 @@ export function generateArticleSchema(data: {
     "@type": "Article",
     headline: data.title,
     description: data.description,
-    image: data.image ? `https://nisabtracker.com${data.image}` : undefined,
+    image: data.image ? `${SITE_URL}${data.image}` : undefined,
     datePublished: data.datePublished,
     dateModified: data.dateModified || data.datePublished,
     author: {
@@ -143,12 +144,12 @@ export function generateArticleSchema(data: {
       name: "Nisab Tracker",
       logo: {
         "@type": "ImageObject",
-        url: "https://nisabtracker.com/logo-192.png",
+        url: `${SITE_URL}/logo-192.png`,
       },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://nisabtracker.com/blog/${data.slug}`,
+      "@id": `${SITE_URL}/blog/${data.slug}`,
     },
   };
 }

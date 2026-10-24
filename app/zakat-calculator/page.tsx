@@ -1,8 +1,36 @@
+import type { Metadata } from "next";
 import { ZakatCalculator } from "@/components/calculator/ZakatCalculator";
 import { PricesUnavailable } from "@/components/ui/PricesUnavailable";
 import { getNisabValuesForPage } from "@/lib/nisab";
+import { OG_IMAGE } from "@/lib/site";
 
 export const revalidate = 3600;
+
+const title = "Zakat Calculator – Calculate Zakat on Cash, Gold & Silver";
+const description =
+  "Work out how much Zakat you owe in your own currency. Enter your cash, gold, silver, investments and debts, and we compare your wealth with today's live Nisab and calculate the 2.5%.";
+
+export const metadata: Metadata = {
+  title: `${title} | Nisab Tracker`,
+  description,
+  alternates: { canonical: "/zakat-calculator" },
+  openGraph: {
+    title,
+    description,
+    url: "/zakat-calculator",
+    siteName: "Nisab Tracker",
+    images: [OG_IMAGE],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@hafizaderemi",
+    title,
+    description,
+    images: [OG_IMAGE.url],
+  },
+};
 
 export default async function CalculatorPage() {
   const nisab = await getNisabValuesForPage();

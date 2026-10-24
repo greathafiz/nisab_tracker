@@ -2,4 +2,4 @@ User-Agent: *
 Allow: /
 Disallow: /api
 
-Sitemap: https://nisabtracker.com/sitemap.xml
+Sitemap: https://www.nisabtracker.com/sitemap.xml

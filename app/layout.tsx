@@ -11,6 +11,7 @@ import {
 } from "@/lib/schema";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
+import { SITE_URL, OG_IMAGE } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,21 +27,13 @@ export const metadata: Metadata = {
   title: "Nisab Tracker | Free Zakat Calculator",
   description:
     "Calculate your Zakat accurately with real-time Nisab values based on daily gold and silver prices. Free Islamic Zakat calculator for Muslims worldwide.",
-  metadataBase: new URL("https://nisabtracker.com"),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     title: "Nisab Tracker | Free Zakat Calculator",
     description:
       "Calculate your Zakat accurately with real-time Nisab values based on daily gold and silver prices. Free Islamic Zakat calculator for Muslims worldwide.",
-    url: "https://nisabtracker.com",
     siteName: "Nisab Tracker",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Nisab Tracker and Free Zakat Calculator",
-      },
-    ],
+    images: [OG_IMAGE],
     locale: "en_US",
     type: "website",
   },
@@ -51,7 +44,6 @@ export const metadata: Metadata = {
     description: "Nisab Tracker and Zakat Calculator",
     images: ["/og-image.png"],
   },
-  alternates: { languages: { en: "/en", ar: "/ar" } },
   verification: { google: "UJhuIAMThdxkuHPVaUkmeN_c1QHDgtpqR2zMa7tAq1U" },
 };
 
