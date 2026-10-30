@@ -7,6 +7,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { trackEvent } from "@/lib/analytics";
 
+// A to Z by code, since that's what each option starts with
+const SORTED_CURRENCIES = Object.values(currencies).sort((a, b) =>
+  a.code.localeCompare(b.code)
+);
+
 const CurrencySelector = ({ className = "" }: { className?: string }) => {
   const { currency, setCurrency } = useCurrencyDate();
 
@@ -26,7 +31,7 @@ const CurrencySelector = ({ className = "" }: { className?: string }) => {
       aria-label="Currency"
       className={`text-sm text-stone-700 bg-white border border-stone-300 rounded-lg px-3 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all ${className}`}
     >
-      {Object.values(currencies).map((curr) => (
+      {SORTED_CURRENCIES.map((curr) => (
         <option key={curr.code} value={curr.code}>
           {curr.code} ({curr.symbol})
         </option>
