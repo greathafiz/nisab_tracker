@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { CurrencyDateProvider } from "@/contexts/CurrencyDateContext";
 import { Header } from "@/components/layouts/Header";
 import { Footer } from "@/components/layouts/Footer";
+import { SiteChrome } from "@/components/layouts/SiteChrome";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
   generateWebApplicationSchema,
@@ -61,28 +61,28 @@ export default function RootLayout({
         <JsonLd data={generateWebApplicationSchema()} />
         <JsonLd data={generateOrganizationSchema()} />
 
-        <CurrencyDateProvider>
-          <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-stone-100">
-            <Header />
-            {children}
-            <Footer />
-          </div>
-        </CurrencyDateProvider>
-        <SpeedInsights />
+        <SiteChrome
+          header={<Header />}
+          footer={<Footer />}
+          analytics={
+            <>
+              <SpeedInsights />
+              <Script
+                src="https://www.googletagmanager.com/gtag/js?id=G-S08RYTFS3W"
+                strategy="afterInteractive"
+              />
+              <Script id="google-analytics" strategy="afterInteractive">
+                {`window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
 
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-S08RYTFS3W"
-          strategy="afterInteractive"
-        />
-
-        <Script id="google-analytics" strategy="afterInteractive">
-          {" "}
-          {` window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-
-          gtag('config', 'G-S08RYTFS3W');`}{" "}
-        </Script>
+                gtag('config', 'G-S08RYTFS3W');`}
+              </Script>
+            </>
+          }
+        >
+          {children}
+        </SiteChrome>
       </body>
     </html>
   );

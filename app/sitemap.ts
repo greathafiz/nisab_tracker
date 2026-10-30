@@ -37,6 +37,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     })),
     {
+      url: `${SITE_URL}/embed`,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
       url: `${SITE_URL}/blog`,
       lastModified: latestPostDate ? new Date(latestPostDate) : undefined,
       changeFrequency: "weekly",

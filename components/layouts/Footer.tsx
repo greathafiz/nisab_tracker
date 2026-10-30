@@ -67,6 +67,11 @@ export const Footer = () => {
                   Nisab by Country
                 </Link>
               </li>
+              <li>
+                <Link href="/embed" className={linkClassName}>
+                  Nisab Widget
+                </Link>
+              </li>
             </ul>
           </div>
 

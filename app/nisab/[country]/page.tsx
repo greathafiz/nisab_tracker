@@ -218,7 +218,16 @@ export default async function CountryNisabPage({ params }: CountryPageProps) {
         url={`${SITE_URL}/nisab/${country.slug}`}
         className="justify-center mb-3"
       />
-      <FollowLinks className="text-center mb-10" />
+      <FollowLinks className="text-center mb-2" />
+      <p className="text-center text-sm text-stone-500 mb-10">
+        Run a mosque or community website?{" "}
+        <Link
+          href={`/embed?country=${country.slug}`}
+          className="font-medium text-stone-700 underline decoration-stone-300 underline-offset-4 hover:text-emerald-700 hover:decoration-emerald-600 transition-colors"
+        >
+          Add today&apos;s Nisab in {inName} to your site
+        </Link>
+      </p>
 
       <div className="text-center mb-16">
         <Link href="/zakat-calculator">

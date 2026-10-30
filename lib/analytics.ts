@@ -19,7 +19,9 @@ type AnalyticsEvent =
   | {
       name: "share";
       params: { method: "whatsapp" | "x" | "copy_link"; item_id: string };
-    };
+    }
+  // Copied the widget code from /embed; item_id is the country slug
+  | { name: "embed_code_copy"; params: { item_id: string } };
 
 /**
  * Send a Google Analytics event. A no-op if gtag hasn't loaded (e.g. blocked by an ad blocker).

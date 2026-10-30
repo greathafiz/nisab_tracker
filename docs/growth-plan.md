@@ -13,6 +13,7 @@ Written 24 October 2026. A reference for growing nisabtracker.com, in priority o
   - Gold karat selector and `/llms.txt`.
   - Nisab pages for 20 countries.
   - Share buttons, per-country link preview images, and a daily post to the @nisabtracker Telegram channel.
+  - An embeddable Nisab widget for other sites, at `/embed`.
 
 ## The date everything works towards: Ramadan 2027
 
@@ -50,7 +51,9 @@ To size the opportunity, look at February–March 2026 in Google Analytics and s
 
 **Effort:** share button and preview images about half a day; automated Telegram posting about a day.
 
-## 3. Embeddable "Today's Nisab" widget
+## 3. Embeddable "Today's Nisab" widget (built; outreach next)
+
+**Status:** built in October 2026. `/embed` lets a site pick its country, preview the widget and copy the code; the widget itself is `/embed/[country]`. The code is an iframe plus a plain "Nisab figures from Nisab Tracker" link under it: links inside an iframe don't count as backlinks, the plain link does. Widget pages are `noindex` and skip GA, so embeds don't inflate visitor numbers. Track it in GA with `embed_code_copy` (copies, by country), sessions with source `widget` (clicks from widgets), and Search Console → Links (sites linking to you).
 
 **Why:** a new domain competes with Islamic Relief, National Zakat Foundation and similar sites, which have years of backlinks. A widget that mosques and Islamic societies put on their websites gives you backlinks and steady referral traffic.
 
