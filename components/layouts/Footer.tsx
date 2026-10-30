@@ -8,6 +8,15 @@ import { AUTHOR, SOCIAL } from "@/lib/site";
 import { XLogo } from "@/components/ui/XLogo";
 
 const linkClassName = "hover:text-emerald-600 transition-colors";
+const FEATURES = [
+  "📈 Daily price updates",
+  "🌙 Hijri calendar integrated",
+  "🔒 Privacy-first approach",
+  "🌍 20+ currencies supported",
+];
+
+const headingClassName =
+  "text-xs font-semibold uppercase tracking-wider text-stone-900 mb-4";
 
 export const Footer = () => {
   const latestPosts = getAllPosts().slice(0, 3);
@@ -15,18 +24,19 @@ export const Footer = () => {
   return (
     <footer className="border-t border-stone-200 bg-white mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
+        {/* Phones: brand on top, Tools and Guides side by side, Features as chips */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10 md:gap-8">
           {/* Brand */}
-          <div>
-            <div className="flex items-center justify-center md:justify-start space-x-2 mb-4">
+          <div className="col-span-2 md:col-span-1">
+            <div className="flex items-center space-x-2 mb-4">
               <Image src="/logo-192.png" alt="Logo" width={40} height={40} />
               <span className="font-bold text-stone-900">Nisab Tracker</span>
             </div>
-            <p className="text-stone-600 text-sm leading-relaxed">
+            <p className="max-w-sm text-stone-600 text-sm leading-relaxed">
               Helping Muslims worldwide fulfill their Zakat obligations with
               accurate, real-time Islamic financial data.
             </p>
-            <div className="flex justify-center md:justify-start gap-2 mt-4">
+            <div className="flex gap-2 mt-4">
               <a
                 href={SOCIAL.telegram}
                 target="_blank"
@@ -50,8 +60,8 @@ export const Footer = () => {
 
           {/* Tools */}
           <div>
-            <h4 className="font-semibold text-stone-900 mb-4">Tools</h4>
-            <ul className="space-y-2 text-sm text-stone-600">
+            <h4 className={headingClassName}>Tools</h4>
+            <ul className="space-y-3 md:space-y-2 text-sm text-stone-600">
               <li>
                 <Link href="/" className={linkClassName}>
                   Today&apos;s Nisab
@@ -77,8 +87,8 @@ export const Footer = () => {
 
           {/* Guides */}
           <div>
-            <h4 className="font-semibold text-stone-900 mb-4">Guides</h4>
-            <ul className="space-y-2 text-sm text-stone-600">
+            <h4 className={headingClassName}>Guides</h4>
+            <ul className="space-y-3 md:space-y-2 text-sm text-stone-600">
               {latestPosts.map((post) => (
                 <li key={post.slug}>
                   <Link href={`/blog/${post.slug}`} className={linkClassName}>
@@ -96,21 +106,25 @@ export const Footer = () => {
           </div>
 
           {/* Features */}
-          <div>
-            <h4 className="font-semibold text-stone-900 mb-4">Features</h4>
-            <div className="text-sm text-stone-600 space-y-2">
-              <p>📈 Daily price updates</p>
-              <p>🌙 Hijri calendar integrated</p>
-              <p>🔒 Privacy-first approach</p>
-              <p>🌍 20+ currencies supported</p>
-            </div>
+          <div className="col-span-2 md:col-span-1">
+            <h4 className={headingClassName}>Features</h4>
+            <ul className="flex flex-wrap gap-2 md:flex-col text-sm text-stone-600">
+              {FEATURES.map((feature) => (
+                <li
+                  key={feature}
+                  className="rounded-full bg-stone-100 px-3 py-1 md:rounded-none md:bg-transparent md:p-0"
+                >
+                  {feature}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
         <Separator className="my-8" />
 
-        <div className="text-center text-stone-500 text-sm">
-          <p>
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between text-stone-500 text-sm">
+          <p className="leading-relaxed">
             Built with love for the Muslim community by{" "}
             <a
               href={AUTHOR.url}
@@ -122,7 +136,7 @@ export const Footer = () => {
             </a>{" "}
             • May Allah accept our efforts
           </p>
-          <p className="mt-2 text-xs">
+          <p className="text-xs">
             © {new Date().getFullYear()} Nisab Tracker. Free forever.
           </p>
         </div>
