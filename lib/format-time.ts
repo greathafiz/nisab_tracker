@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from "react";
+
 /**
  * Format a date string to relative time (e.g., "Today at 11:11 AM", "Yesterday", "2 days ago")
  * Falls back to absolute date for older dates
@@ -90,4 +92,28 @@ export function formatLastUpdated(dateString: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function subscribeToMinutes(onChange: () => void) {
+  const interval = setInterval(onChange, 60 * 1000);
+  return () => clearInterval(interval);
+}
+
+/**
+ * formatLastUpdated for rendering. It depends on the current time and the visitor's
+ * time zone, so the server renders a fixed UTC date and the browser swaps in the
+ * relative time, which would otherwise differ and break hydration.
+ */
+export function useLastUpdated(dateString: string): string {
+  return useSyncExternalStore(
+    subscribeToMinutes,
+    () => formatLastUpdated(dateString),
+    () =>
+      new Date(dateString).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      })
+  );
 }

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useCurrencyDate } from "@/contexts/CurrencyDateContext";
-import { formatLastUpdated } from "@/lib/format-time";
+import { useLastUpdated } from "@/lib/format-time";
 import { trackEvent } from "@/lib/analytics";
 import type { NisabValues } from "@/lib/nisab";
 import { nisabAmounts } from "@/lib/nisab-standards";
@@ -43,6 +43,7 @@ interface ZakatCalculatorProps {
 export function ZakatCalculator({ nisab }: ZakatCalculatorProps) {
   const { displayCurrency, convertFromUSD, nisabStandard } = useCurrencyDate();
   const nisabUSD = nisabAmounts(nisab, nisabStandard);
+  const lastUpdated = useLastUpdated(nisab.lastUpdated);
   const [wealthData, setWealthData] =
     useState<WealthDataWithDebts>(EMPTY_WEALTH_DATA);
   const [nisabType, setNisabType] = useState<NisabType>("silver");
@@ -152,10 +153,7 @@ export function ZakatCalculator({ nisab }: ZakatCalculatorProps) {
 
   return (
     <>
-      <PricesNotice
-        isStale={nisab.isStale}
-        lastUpdated={formatLastUpdated(nisab.lastUpdated)}
-      />
+      <PricesNotice isStale={nisab.isStale} lastUpdated={lastUpdated} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Input Form */}

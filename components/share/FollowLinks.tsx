@@ -11,24 +11,27 @@ export function FollowLinks({ className }: { className?: string }) {
   return (
     <p className={cn("text-sm text-stone-500", className)}>
       Get today&apos;s Nisab every day on{" "}
-      <a
-        href={SOCIAL.telegram}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={linkClass}
-      >
-        <Send className="size-3.5 text-[#229ED9]" aria-hidden="true" />
-        Telegram
-      </a>{" "}
-      or{" "}
-      <a
-        href={SOCIAL.x}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={linkClass}
-      >
-        <XLogo />X
-      </a>
+      {/* Kept together so "X" never wraps onto a line of its own */}
+      <span className="whitespace-nowrap">
+        <a
+          href={SOCIAL.telegram}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClass}
+        >
+          <Send className="size-3.5 text-[#229ED9]" aria-hidden="true" />
+          Telegram
+        </a>{" "}
+        or{" "}
+        <a
+          href={SOCIAL.x}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClass}
+        >
+          <XLogo />X
+        </a>
+      </span>
     </p>
   );
 }

@@ -53,9 +53,10 @@ export const Header = () => {
                 priority
               />
               <div>
-                <h1 className="text-lg sm:text-2xl font-bold text-stone-900 tracking-tight">
+                {/* Not a heading: each page has its own h1 */}
+                <div className="text-lg sm:text-2xl font-bold text-stone-900 tracking-tight">
                   Nisab Tracker
-                </h1>
+                </div>
                 <p className="text-xs text-stone-500 font-medium tracking-wide hidden md:block">
                   ISLAMIC FINANCIAL CALCULATOR
                 </p>
@@ -63,17 +64,23 @@ export const Header = () => {
             </Link>
 
             {/* Desktop Nav */}
-            <div className="hidden md:flex items-center space-x-8">
-              <nav className="flex items-center space-x-6">
+            <div className="hidden md:flex items-center space-x-5 lg:space-x-8">
+              <nav className="flex items-center space-x-5 lg:space-x-6">
                 <Link
                   href="/zakat-calculator"
-                  className="text-stone-600 hover:text-emerald-700 font-medium text-sm transition-colors"
+                  className="whitespace-nowrap text-stone-600 hover:text-emerald-700 font-medium text-sm transition-colors"
                 >
                   Zakat Calculator
                 </Link>
                 <Link
+                  href="/nisab"
+                  className="whitespace-nowrap text-stone-600 hover:text-emerald-700 font-medium text-sm transition-colors"
+                >
+                  Nisab by Country
+                </Link>
+                <Link
                   href="/blog"
-                  className="text-stone-600 hover:text-emerald-700 font-medium text-sm transition-colors"
+                  className="whitespace-nowrap text-stone-600 hover:text-emerald-700 font-medium text-sm transition-colors"
                 >
                   Blog
                 </Link>
@@ -82,7 +89,8 @@ export const Header = () => {
               <div className="w-px h-5 bg-stone-200" />
 
               <div className="flex items-center space-x-4">
-                <div className="hidden lg:flex items-center space-x-2 text-sm">
+                {/* Only where it fits on one line next to the three links */}
+                <div className="hidden xl:flex items-center space-x-2 text-sm whitespace-nowrap">
                   <Badge
                     variant="outline"
                     className="text-stone-600 border-stone-300"
@@ -152,6 +160,13 @@ export const Header = () => {
                 className="block px-3 py-3 rounded-lg text-stone-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium text-sm transition-colors"
               >
                 Zakat Calculator
+              </Link>
+              <Link
+                href="/nisab"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-3 rounded-lg text-stone-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium text-sm transition-colors"
+              >
+                Nisab by Country
               </Link>
               <Link
                 href="/blog"

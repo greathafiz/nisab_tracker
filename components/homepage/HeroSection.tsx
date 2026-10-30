@@ -1,10 +1,12 @@
+import { formatAmount } from "@/lib/currencies";
+import { cn } from "@/lib/utils";
+
 interface HeroSectionProps {
   lastUpdated: string;
   isStale?: boolean;
-  goldPricePerGram?: number;
-  silverPricePerGram?: number;
-  currency?: string;
-  isLoading?: boolean;
+  goldPricePerGram: number;
+  silverPricePerGram: number;
+  currency: string;
 }
 
 export const HeroSection = ({
@@ -13,80 +15,43 @@ export const HeroSection = ({
   goldPricePerGram,
   silverPricePerGram,
   currency,
-  isLoading = false,
 }: HeroSectionProps) => {
   return (
-    <div className="text-center mb-16">
-      {lastUpdated &&
-        (isStale ? (
-          <div className="inline-flex items-center space-x-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-            <span>Updated {lastUpdated}</span>
-          </div>
-        ) : (
-          <div className="inline-flex items-center space-x-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-            <span>Live Data • Updated {lastUpdated}</span>
-          </div>
-        ))}
-
-      {/* Current spot prices - small and subtle */}
-      {goldPricePerGram && silverPricePerGram && currency && (
-        <div className="mb-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center gap-4 text-xs text-stone-500">
-              <div className="h-3 w-24 bg-stone-200 rounded animate-pulse"></div>
-              <div className="h-3 w-24 bg-stone-200 rounded animate-pulse"></div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-6 text-xs text-stone-600">
-              <div className="flex items-center gap-1.5">
-                <span className="text-amber-500">🥇</span>
-                <span className="font-medium">
-                  {currency} {goldPricePerGram.toLocaleString()}/g
-                </span>
-              </div>
-              <div className="w-px h-4 bg-stone-300"></div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-stone-400">🥈</span>
-                <span className="font-medium">
-                  {currency} {silverPricePerGram.toLocaleString()}/g
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="text-center mb-4">
-        <p className="text-xs text-stone-500 max-w-xl mx-auto">
-          Based on international spot prices from trusted precious metals data
-          providers
-          <span className="mx-2">•</span>
-          Data refreshed every day for accuracy
-        </p>
-      </div>
-      <h2 className="text-5xl font-bold text-stone-900 mb-6 tracking-tight">
-        Today&apos;s Nisab Value
-      </h2>
-      <p className="text-xl text-stone-600 max-w-3xl mx-auto leading-relaxed">
-        Track real-time Nisab thresholds for today and calculate your Zakat
-        obligations with
-        <span className="font-semibold text-stone-700">
-          {" "}
-          accurate, up-to-date
-        </span>{" "}
-        Islamic financial data.
+    <div className="text-center mb-12">
+      <h1 className="text-4xl sm:text-5xl font-bold text-stone-900 mb-4 tracking-tight">
+        Today&apos;s Nisab
+      </h1>
+      <p className="text-lg sm:text-xl text-stone-600 max-w-2xl mx-auto leading-relaxed mb-6">
+        The minimum wealth on which Zakat is due, worked out from today&apos;s
+        gold and silver prices.
       </p>
-      <div className="mt-8 flex items-center justify-center space-x-6 text-sm text-stone-500">
-        <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-amber-400 rounded-full"></div>
-          <span>Gold Nisab</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-stone-400 rounded-full"></div>
-          <span>Silver Nisab</span>
-        </div>
+
+      {/* Freshness and the spot prices behind the figures, in one line */}
+      <div className="inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-2xl sm:rounded-full bg-white border border-stone-200 px-4 py-1.5 text-xs text-stone-600">
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5 font-medium",
+            isStale ? "text-amber-700" : "text-emerald-700"
+          )}
+        >
+          <span
+            className={cn(
+              "size-2 rounded-full",
+              isStale ? "bg-amber-500" : "bg-emerald-500 animate-pulse"
+            )}
+            aria-hidden="true"
+          />
+          Updated {lastUpdated}
+        </span>
+        <span className="text-stone-300" aria-hidden="true">
+          |
+        </span>
+        <span className="whitespace-nowrap">
+          Gold {currency} {formatAmount(goldPricePerGram)}/g
+        </span>
+        <span className="whitespace-nowrap">
+          Silver {currency} {formatAmount(silverPricePerGram)}/g
+        </span>
       </div>
     </div>
   );
