@@ -18,6 +18,8 @@ interface NisabThresholdSelectorProps {
   silverNisab: number;
   goldNisab: number;
   formatCurrency: (amount: number) => string;
+  // Placeholder badges while the visitor's currency is being worked out
+  isLoading?: boolean;
 }
 
 export function NisabThresholdSelector({
@@ -26,7 +28,20 @@ export function NisabThresholdSelector({
   silverNisab,
   goldNisab,
   formatCurrency,
+  isLoading = false,
 }: NisabThresholdSelectorProps) {
+  const amountBadge = (amount: number) =>
+    isLoading ? (
+      <span className="h-5 w-24 rounded-md bg-stone-200 animate-pulse" />
+    ) : (
+      <Badge
+        variant="secondary"
+        className="text-xs whitespace-nowrap cursor-pointer"
+      >
+        {formatCurrency(amount)}
+      </Badge>
+    );
+
   return (
     <Card>
       <CardHeader className="pb-4">
@@ -46,12 +61,7 @@ export function NisabThresholdSelector({
           >
             <div className="flex items-center justify-between w-full gap-3">
               <span className="font-medium">Silver Nisab</span>
-              <Badge
-                variant="secondary"
-                className="text-xs whitespace-nowrap cursor-pointer"
-              >
-                {formatCurrency(silverNisab)}
-              </Badge>
+              {amountBadge(silverNisab)}
             </div>
           </Button>
           <Button
@@ -61,12 +71,7 @@ export function NisabThresholdSelector({
           >
             <div className="flex items-center justify-between w-full gap-3">
               <span className="font-medium">Gold Nisab</span>
-              <Badge
-                variant="secondary"
-                className="text-xs whitespace-nowrap cursor-pointer"
-              >
-                {formatCurrency(goldNisab)}
-              </Badge>
+              {amountBadge(goldNisab)}
             </div>
           </Button>
         </div>

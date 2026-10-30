@@ -142,6 +142,9 @@ interface CurrencyDateContextType {
   convertFromUSD: (amount: number) => number;
   // True when rates failed to load, so a non-USD selection is being shown in USD
   ratesUnavailable: boolean;
+  // True until the visitor's currency is known and its rate has loaded: amounts
+  // should show a placeholder rather than flash USD first
+  isConverting: boolean;
   // Gram weights for the Nisab: the visitor's choice, or the norm for their currency
   nisabStandard: NisabStandardId;
   setNisabStandard: (standard: NisabStandardId) => void;
@@ -161,6 +164,12 @@ export function CurrencyDateProvider({ children }: { children: ReactNode }) {
     () => "USD"
   );
   const currencyCode = selectedCode ?? detectedCode;
+  // Static HTML is rendered before the country cookie can be read
+  const isHydrated = useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false
+  );
 
   const selectedStandard = useSyncExternalStore(
     subscribeToStandard,
@@ -209,6 +218,7 @@ export function CurrencyDateProvider({ children }: { children: ReactNode }) {
     displayCurrency: rate ? currencies[currencyCode] : currencies.USD,
     convertFromUSD: (amount) => amount * (rate ?? 1),
     ratesUnavailable: !rate && !isLoadingRates,
+    isConverting: !isHydrated || (!rate && isLoadingRates),
     nisabStandard,
     setNisabStandard: storeStandard,
     hijriDate,

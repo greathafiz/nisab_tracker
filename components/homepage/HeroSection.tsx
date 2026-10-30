@@ -7,6 +7,8 @@ interface HeroSectionProps {
   goldPricePerGram: number;
   silverPricePerGram: number;
   currency: string;
+  // Placeholder bars while the visitor's currency is being worked out
+  isLoading?: boolean;
 }
 
 export const HeroSection = ({
@@ -15,6 +17,7 @@ export const HeroSection = ({
   goldPricePerGram,
   silverPricePerGram,
   currency,
+  isLoading = false,
 }: HeroSectionProps) => {
   return (
     <div className="text-center mb-12">
@@ -46,12 +49,21 @@ export const HeroSection = ({
         <span className="text-stone-300" aria-hidden="true">
           |
         </span>
-        <span className="whitespace-nowrap">
-          Gold {currency} {formatAmount(goldPricePerGram)}/g
-        </span>
-        <span className="whitespace-nowrap">
-          Silver {currency} {formatAmount(silverPricePerGram)}/g
-        </span>
+        {isLoading ? (
+          <>
+            <span className="h-3 w-28 rounded bg-stone-200 animate-pulse" />
+            <span className="h-3 w-28 rounded bg-stone-200 animate-pulse" />
+          </>
+        ) : (
+          <>
+            <span className="whitespace-nowrap">
+              Gold {currency} {formatAmount(goldPricePerGram)}/g
+            </span>
+            <span className="whitespace-nowrap">
+              Silver {currency} {formatAmount(silverPricePerGram)}/g
+            </span>
+          </>
+        )}
       </div>
     </div>
   );

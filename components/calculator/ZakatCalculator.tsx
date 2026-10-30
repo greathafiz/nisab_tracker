@@ -41,7 +41,8 @@ interface ZakatCalculatorProps {
 }
 
 export function ZakatCalculator({ nisab }: ZakatCalculatorProps) {
-  const { displayCurrency, convertFromUSD, nisabStandard } = useCurrencyDate();
+  const { displayCurrency, convertFromUSD, nisabStandard, isConverting } =
+    useCurrencyDate();
   const nisabUSD = nisabAmounts(nisab, nisabStandard);
   const lastUpdated = useLastUpdated(nisab.lastUpdated);
   const [wealthData, setWealthData] =
@@ -164,6 +165,7 @@ export function ZakatCalculator({ nisab }: ZakatCalculatorProps) {
             silverNisab={nisabSilver}
             goldNisab={nisabGold}
             formatCurrency={formatCurrency}
+            isLoading={isConverting}
           />
 
           <WealthInputForm

@@ -18,7 +18,8 @@ interface HomePageWrapperProps {
 }
 
 export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
-  const { displayCurrency, convertFromUSD, nisabStandard } = useCurrencyDate();
+  const { displayCurrency, convertFromUSD, nisabStandard, isConverting } =
+    useCurrencyDate();
   const standard = NISAB_STANDARDS[nisabStandard];
   const nisab = nisabAmounts(initialData, nisabStandard);
 
@@ -53,6 +54,7 @@ export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
         goldPricePerGram={goldPricePerGramVal}
         silverPricePerGram={silverPricePerGramVal}
         currency={displayCurrency.code}
+        isLoading={isConverting}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
@@ -63,6 +65,7 @@ export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
           description={`${standard.goldGrams} grams of gold`}
           lastUpdated={lastUpdated}
           featured={true}
+          isLoading={isConverting}
           change={goldPriceChange}
           icon="🥇"
         />
@@ -73,6 +76,7 @@ export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
           description={`${standard.silverGrams} grams of silver`}
           lastUpdated={lastUpdated}
           featured={true}
+          isLoading={isConverting}
           change={silverPriceChange}
           icon="🥈"
         />
