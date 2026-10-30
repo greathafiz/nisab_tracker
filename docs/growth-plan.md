@@ -12,6 +12,7 @@ Written 24 October 2026. A reference for growing nisabtracker.com, in priority o
   - Analytics events: `calculator_start`, `zakat_due_shown`, `reminder_signup`, `currency_change`.
   - Gold karat selector and `/llms.txt`.
   - Nisab pages for 20 countries.
+  - Share buttons, per-country link preview images, and a daily post to the @nisabtracker Telegram channel.
 
 ## The date everything works towards: Ramadan 2027
 
@@ -35,7 +36,7 @@ To size the opportunity, look at February–March 2026 in Google Analytics and s
 - Add countries where you see demand. Candidates: Germany, France, Netherlands, Singapore, Sri Lanka, Kenya, Ghana, Sudan, Tanzania. A new country is one line in `lib/countries.ts`, plus its currency in `lib/currencies.ts` if it's new.
 - Enrich the best performers with local detail, such as national Zakat bodies or common local karats (21k in the Gulf, 22k in South Asia).
 
-## 2. Make the daily figure shareable
+## 2. Make the daily figure shareable (done)
 
 **Status:** built in October 2026: share buttons, per-country preview images, and a daily post to the [@nisabtracker](https://t.me/nisabtracker) Telegram channel. X posting costs about $0.15 a post, so it only runs in Ramadan (1 Feb – 12 Mar 2027); top up X API credits in late January. No WhatsApp channel: it can't be posted to automatically. Track shares in GA → Events → `share`, by `method` and `item_id` (the shared page).
 
@@ -138,18 +139,19 @@ Following the plan in `.github/instructions/FEATURES.md`:
 | Search Console → Links       | Sites linking to you                                                    | Tracks whether the widget and outreach are working |
 | GA → Events                  | `calculator_start` ÷ active users                                       | Share of visitors who actually use the tool        |
 | GA → Events                  | `zakat_due_shown`, `reminder_signup` (key event)                        | Engagement and demand for reminders                |
+| GA → Events                  | `share` by `method`                                                     | Whether visitors share the figure, and where       |
 | GA → Events                  | `currency_change` by `selected_currency`                                | Which currencies and countries to add next         |
 | Google Sheet                 | Waitlist signups                                                        | Demand for the tracker                             |
 
 ## Timeline to Ramadan 2027
 
-| When                         | Do                                                                                                                         |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Late Oct – Nov 2026          | Resubmit the sitemap in Search Console. Build the share button and preview images. Build the widget. Publish 2–3 articles. |
-| Dec 2026                     | Build the calendar reminder. Contact mosques and Islamic societies about the widget. Publish 2–3 articles.                 |
-| Early – mid Jan 2027         | Publish a "Zakat in Ramadan 2027" page (dates, today's nisab, checklist). Check everything is indexed in Search Console.   |
-| Ramadan (8 Feb – 9 Mar 2027) | Post the nisab daily. Watch analytics. Collect feedback. Email the waitlist if reminders are ready.                        |
-| After Eid                    | Review the numbers. Decide on accounts, languages, and crop/livestock calculators.                                         |
+| When                         | Do                                                                                                                                                                               |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Late Oct – Nov 2026          | Resubmit the sitemap in Search Console. Build the widget. Publish 2–3 articles.                                                                                                  |
+| Dec 2026                     | Build the calendar reminder. Contact mosques and Islamic societies about the widget. Publish 2–3 articles.                                                                       |
+| Early – mid Jan 2027         | Publish a "Zakat in Ramadan 2027" page (dates, today's nisab, checklist). Check everything is indexed in Search Console. Top up X API credits so X posting starts on 1 February. |
+| Ramadan (8 Feb – 9 Mar 2027) | Post the nisab daily. Watch analytics. Collect feedback. Email the waitlist if reminders are ready.                                                                              |
+| After Eid                    | Review the numbers. Decide on accounts, languages, and crop/livestock calculators.                                                                                               |
 
 ## Realistic expectations
 
