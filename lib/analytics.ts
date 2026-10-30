@@ -14,7 +14,12 @@ type AnalyticsEvent =
     }
   // Joined the Zakat reminder waitlist; mark this as a key event in GA
   | { name: "reminder_signup" }
-  | { name: "currency_change"; params: { selected_currency: string } };
+  | { name: "currency_change"; params: { selected_currency: string } }
+  // GA's recommended share event; item_id is the shared page's path
+  | {
+      name: "share";
+      params: { method: "whatsapp" | "x" | "copy_link"; item_id: string };
+    };
 
 /**
  * Send a Google Analytics event. A no-op if gtag hasn't loaded (e.g. blocked by an ad blocker).

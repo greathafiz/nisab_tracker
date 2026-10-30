@@ -71,3 +71,8 @@ export function formatAmount(amount: number): string {
 export function formatMoney(amount: number, code: CurrencyCode): string {
   return `${code} ${formatAmount(amount)}`;
 }
+
+// "NGN 1,425,625": whole units, for share text and preview images where decimals are noise
+export function formatMoneyRounded(amount: number, code: CurrencyCode): string {
+  return `${code} ${Math.round(amount).toLocaleString("en-US")}`;
+}

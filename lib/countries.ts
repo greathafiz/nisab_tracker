@@ -39,6 +39,12 @@ export function getCountry(slug: string): Country | undefined {
   return COUNTRIES.find((country) => country.slug === slug);
 }
 
+export function getCountryByCurrency(
+  currency: CurrencyCode
+): Country | undefined {
+  return COUNTRIES.find((country) => country.currency === currency);
+}
+
 export function countryInName(country: Country): string {
   return country.inName ?? country.name;
 }

@@ -15,13 +15,15 @@ import {
 } from "@/lib/countries";
 import { currencies, formatMoney, formatAmount } from "@/lib/currencies";
 import { generateBreadcrumbSchema, generateFAQSchema } from "@/lib/schema";
-import { SITE_URL, OG_IMAGE } from "@/lib/site";
+import { SITE_URL } from "@/lib/site";
+import { nisabShareText } from "@/lib/share";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { NisabCard } from "@/components/homepage/NisabCard";
 import { PricesNotice } from "@/components/ui/PricesNotice";
 import { PricesUnavailable } from "@/components/ui/PricesUnavailable";
 import { SyncCurrency } from "@/components/nisab/SyncCurrency";
 import { CountryLinks } from "@/components/nisab/CountryLinks";
+import { ShareButtons } from "@/components/share/ShareButtons";
 import { Button } from "@/components/ui/shadcn/button";
 
 export const revalidate = 3600;
@@ -47,6 +49,7 @@ export async function generateMetadata({
   const description = `Today's Zakat Nisab in ${inName}: the silver and gold Nisab in ${currencyName}, gold prices per gram by karat, and how much Zakat you owe. Updated daily.`;
   const path = `/nisab/${country.slug}`;
 
+  // The preview image comes from opengraph-image.tsx, showing today's figures
   return {
     title: `${title} | Nisab Tracker`,
     description,
@@ -56,7 +59,6 @@ export async function generateMetadata({
       description,
       url: path,
       siteName: "Nisab Tracker",
-      images: [OG_IMAGE],
       locale: "en_US",
       type: "website",
     },
@@ -65,7 +67,6 @@ export async function generateMetadata({
       site: "@hafizaderemi",
       title,
       description,
-      images: [OG_IMAGE.url],
     },
   };
 }
@@ -203,6 +204,18 @@ export default async function CountryNisabPage({ params }: CountryPageProps) {
           icon="🥇"
         />
       </div>
+
+      <ShareButtons
+        text={nisabShareText({
+          place: inName,
+          silver: nisabUSD.silver * rate,
+          gold: nisabUSD.gold * rate,
+          currency: code,
+          date: updatedOn,
+        })}
+        url={`${SITE_URL}/nisab/${country.slug}`}
+        className="justify-center mb-10"
+      />
 
       <div className="text-center mb-16">
         <Link href="/zakat-calculator">

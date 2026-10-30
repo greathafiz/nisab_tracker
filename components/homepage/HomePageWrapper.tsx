@@ -9,6 +9,8 @@ import { CountryLinks } from "@/components/nisab/CountryLinks";
 import { NisabStandardToggle } from "@/components/ui/NisabStandardToggle";
 import type { NisabValues } from "@/lib/nisab";
 import { NISAB_STANDARDS, nisabAmounts } from "@/lib/nisab-standards";
+import { nisabShareText, nisabShareTarget } from "@/lib/share";
+import { ShareButtons } from "@/components/share/ShareButtons";
 
 interface HomePageWrapperProps {
   initialData: NisabValues;
@@ -36,6 +38,8 @@ export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
   });
   const lastUpdated = formatLastUpdated(initialData.lastUpdated);
   const goldPriceChange = `${initialData.goldPriceChange >= 0 ? "+" : ""}${initialData.goldPriceChange.toFixed(1)}%`;
+  // Link to the currency's country page, whose preview image carries the figures
+  const shareTarget = nisabShareTarget(displayCurrency.code);
   const silverPriceChange = `${initialData.silverPriceChange >= 0 ? "+" : ""}${initialData.silverPriceChange.toFixed(1)}%`;
 
   return (
@@ -73,7 +77,25 @@ export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
         />
       </div>
 
-      <NisabStandardToggle className="-mt-8 mb-16 text-center" />
+      <NisabStandardToggle className="-mt-8 mb-8 text-center" />
+
+      <ShareButtons
+        text={nisabShareText({
+          place: shareTarget.place,
+          silver: nisabSilverVal,
+          gold: nisabGoldVal,
+          currency: displayCurrency.code,
+          // Absolute, since forwards are read days later
+          date: new Date(initialData.lastUpdated).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            timeZone: "UTC",
+          }),
+        })}
+        url={shareTarget.url}
+        className="justify-center mb-16"
+      />
 
       <section className="mb-16 text-center">
         <h2 className="text-xl font-semibold text-stone-900 mb-4">
