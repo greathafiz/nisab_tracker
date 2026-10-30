@@ -24,6 +24,7 @@ import { PricesUnavailable } from "@/components/ui/PricesUnavailable";
 import { SyncCurrency } from "@/components/nisab/SyncCurrency";
 import { CountryLinks } from "@/components/nisab/CountryLinks";
 import { ShareButtons } from "@/components/share/ShareButtons";
+import { FollowLinks } from "@/components/share/FollowLinks";
 import { Button } from "@/components/ui/shadcn/button";
 
 export const revalidate = 3600;
@@ -64,7 +65,8 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      site: "@hafizaderemi",
+      site: "@nisabtracker",
+      creator: "@hafizaderemi",
       title,
       description,
     },
@@ -214,8 +216,9 @@ export default async function CountryNisabPage({ params }: CountryPageProps) {
           date: updatedOn,
         })}
         url={`${SITE_URL}/nisab/${country.slug}`}
-        className="justify-center mb-10"
+        className="justify-center mb-3"
       />
+      <FollowLinks className="text-center mb-10" />
 
       <div className="text-center mb-16">
         <Link href="/zakat-calculator">

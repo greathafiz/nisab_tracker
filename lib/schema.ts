@@ -7,7 +7,7 @@ import {
   FAQPage,
   BreadcrumbList,
 } from "schema-dts";
-import { SITE_URL, AUTHOR } from "./site";
+import { SITE_URL, AUTHOR, SOCIAL } from "./site";
 
 /**
  * Generate WebApplication schema for the Nisab Tracker
@@ -54,6 +54,8 @@ export function generateOrganizationSchema(): WithContext<Organization> {
       width: "192",
       height: "192",
     },
+    // Ties the site to its social accounts for search engines
+    sameAs: [SOCIAL.telegram, SOCIAL.x],
     foundingDate: "2025-10-26",
     founder: {
       "@type": "Person",

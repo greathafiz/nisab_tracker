@@ -3,7 +3,9 @@ import { Separator } from "../ui/shadcn/separator";
 import Link from "next/link";
 import Image from "next/image";
 import { getAllPosts } from "@/lib/blog";
-import { AUTHOR } from "@/lib/site";
+import { Send } from "lucide-react";
+import { AUTHOR, SOCIAL } from "@/lib/site";
+import { XLogo } from "@/components/ui/XLogo";
 
 const linkClassName = "hover:text-emerald-600 transition-colors";
 
@@ -24,6 +26,26 @@ export const Footer = () => {
               Helping Muslims worldwide fulfill their Zakat obligations with
               accurate, real-time Islamic financial data.
             </p>
+            <div className="flex justify-center md:justify-start gap-2 mt-4">
+              <a
+                href={SOCIAL.telegram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Nisab Tracker on Telegram"
+                className="flex size-9 items-center justify-center rounded-full border border-stone-200 text-stone-600 hover:border-emerald-300 hover:text-emerald-700 transition-colors"
+              >
+                <Send className="size-4" aria-hidden="true" />
+              </a>
+              <a
+                href={SOCIAL.x}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Nisab Tracker on X"
+                className="flex size-9 items-center justify-center rounded-full border border-stone-200 text-stone-600 hover:border-emerald-300 hover:text-emerald-700 transition-colors"
+              >
+                <XLogo />
+              </a>
+            </div>
           </div>
 
           {/* Tools */}

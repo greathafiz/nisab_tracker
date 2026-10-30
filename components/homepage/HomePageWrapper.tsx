@@ -11,6 +11,7 @@ import type { NisabValues } from "@/lib/nisab";
 import { NISAB_STANDARDS, nisabAmounts } from "@/lib/nisab-standards";
 import { nisabShareText, nisabShareTarget } from "@/lib/share";
 import { ShareButtons } from "@/components/share/ShareButtons";
+import { FollowLinks } from "@/components/share/FollowLinks";
 
 interface HomePageWrapperProps {
   initialData: NisabValues;
@@ -94,8 +95,9 @@ export function HomePageWrapper({ initialData }: HomePageWrapperProps) {
           }),
         })}
         url={shareTarget.url}
-        className="justify-center mb-16"
+        className="justify-center mb-3"
       />
+      <FollowLinks className="text-center mb-16" />
 
       <section className="mb-16 text-center">
         <h2 className="text-xl font-semibold text-stone-900 mb-4">

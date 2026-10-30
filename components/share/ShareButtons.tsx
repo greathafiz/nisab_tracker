@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Check, Link2, MessageCircle } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { XLogo } from "@/components/ui/XLogo";
 
 interface ShareButtonsProps {
   // The message, without the link; each network gets the link its own way
@@ -13,18 +14,6 @@ interface ShareButtonsProps {
 
 const buttonClass =
   "inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 transition-colors hover:border-emerald-300 hover:text-emerald-700 cursor-pointer";
-
-function XLogo() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className="size-3.5 fill-current"
-    >
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  );
-}
 
 export function ShareButtons({ text, url, className }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);

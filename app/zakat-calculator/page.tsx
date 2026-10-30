@@ -25,7 +25,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@hafizaderemi",
+    site: "@nisabtracker",
+    creator: "@hafizaderemi",
     title,
     description,
     images: [OG_IMAGE.url],

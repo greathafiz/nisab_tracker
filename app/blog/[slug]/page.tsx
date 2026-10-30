@@ -55,7 +55,8 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      site: "@hafizaderemi",
+      site: "@nisabtracker",
+      creator: "@hafizaderemi",
       title: post.title,
       description: post.description,
       images: [post.image || OG_IMAGE.url],
