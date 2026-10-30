@@ -37,6 +37,8 @@ To size the opportunity, look at February–March 2026 in Google Analytics and s
 
 ## 2. Make the daily figure shareable
 
+**Status:** built in October 2026: share buttons, per-country preview images, and a daily post to the [@nisabtracker](https://t.me/nisabtracker) Telegram channel. X posting costs about $0.15 a post, so it only runs in Ramadan (1 Feb – 12 Mar 2027); top up X API credits in late January. No WhatsApp channel: it can't be posted to automatically. Track shares in GA → Events → `share`, by `method` and `item_id` (the shared page).
+
 **Why:** your audience shares on WhatsApp. During Ramadan, mosque and family groups forward "today's nisab" messages, and each forward is a free visit.
 
 **How:**

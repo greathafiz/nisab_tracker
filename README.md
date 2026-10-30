@@ -17,18 +17,21 @@ The homepage and calculator use ISR (`revalidate = 3600`). If data is unavailabl
 
 ## Environment variables
 
-Set these in Vercel (and in `.env.local` to run locally):
+Set these in Vercel (and in `.env` or `.env.local` in the project root to run locally):
 
-| Variable                    | Used for                                                                      |
-| --------------------------- | ----------------------------------------------------------------------------- |
-| `STORAGE_REDIS_URL`         | Redis connection string                                                       |
-| `METALPRICEAPI_API_KEY`     | Primary metal price source (free tier: 100 req/month)                         |
-| `GOLDAPI_IO_API_KEY`        | Fallback metal price source                                                   |
-| `ISLAMICAPI_API_KEY`        | Second fallback metal price source                                            |
-| `EXCHANGERATEAPI_API_KEY`   | Exchange rates                                                                |
-| `CRON_SECRET`               | Vercel sends it as a Bearer token to authorize the cron route                 |
-| `GOOGLE_SHEETS_WEB_APP_URL` | Apps Script endpoint that stores Zakat reminder waitlist emails               |
-| `NEXT_PUBLIC_APP_URL`       | Optional; base URL for client-side API calls (defaults to the current origin) |
+| Variable                                  | Used for                                                                       |
+| ----------------------------------------- | ------------------------------------------------------------------------------ |
+| `STORAGE_REDIS_URL`                       | Redis connection string                                                        |
+| `METALPRICEAPI_API_KEY`                   | Primary metal price source (free tier: 100 req/month)                          |
+| `GOLDAPI_IO_API_KEY`                      | Fallback metal price source                                                    |
+| `ISLAMICAPI_API_KEY`                      | Second fallback metal price source                                             |
+| `EXCHANGERATEAPI_API_KEY`                 | Exchange rates                                                                 |
+| `CRON_SECRET`                             | Vercel sends it as a Bearer token to authorize the cron route                  |
+| `GOOGLE_SHEETS_WEB_APP_URL`               | Apps Script endpoint that stores Zakat reminder waitlist emails                |
+| `TELEGRAM_BOT_TOKEN`                      | Bot that posts the daily Nisab to the @nisabtracker channel (must be an admin) |
+| `X_API_KEY`, `X_API_SECRET`               | X app's Consumer Key and Secret, for the daily post to @nisabtracker           |
+| `X_ACCESS_TOKEN`, `X_ACCESS_TOKEN_SECRET` | @nisabtracker's OAuth 1.0a access token (Read and write)                       |
+| `NEXT_PUBLIC_APP_URL`                     | Optional; base URL for client-side API calls (defaults to the current origin)  |
 
 With the Vercel CLI linked to the project, `vercel env pull .env.local` fetches them.
 
@@ -48,6 +51,15 @@ The pre-commit hook (Husky + lint-staged) runs ESLint and Prettier on staged fil
 ## Country pages
 
 `/nisab` and `/nisab/[country]` show the Nisab in each local currency, rendered on the server so search engines see local values. Countries are listed in `lib/countries.ts`; to add one, add an entry there (its currency must be in `lib/currencies.ts`). The sitemap, llms.txt and the country links pick it up automatically.
+
+## Daily social posts
+
+A second cron (05:00 UTC) calls `/api/cron/daily-post`, which posts today's Nisab to the [@nisabtracker](https://t.me/nisabtracker) Telegram channel, and to [@nisabtracker](https://x.com/nisabtracker) on X. The code is in `lib/daily-post.ts` and `lib/social/`.
+
+- It skips the day if the 02:00 price update failed, rather than repeating old figures.
+- Each post is marked in Redis, so rerunning the cron never posts twice.
+- X charges per post (about $0.15), so it only posts inside `X_POSTING_WINDOW` in `lib/social/x.ts` (Ramadan). Before each Ramadan, move the window and top up X API credits.
+- To see the messages without posting: `curl -H "Authorization: Bearer $CRON_SECRET" "http://localhost:3000/api/cron/daily-post?dryRun=1"`
 
 ## Blog
 
