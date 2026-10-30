@@ -60,6 +60,68 @@ export const currencies: Record<CurrencyCode, Currency> = {
   NGN: { code: "NGN", symbol: "₦", name: "Nigerian Naira" },
 };
 
+// Set by proxy.ts to the visitor's ISO country code, e.g. "NG"
+export const COUNTRY_COOKIE = "country";
+
+// Countries using the Euro (eurozone members plus states that adopted it)
+const EURO_COUNTRIES = [
+  "AT",
+  "BE",
+  "BG",
+  "HR",
+  "CY",
+  "EE",
+  "FI",
+  "FR",
+  "DE",
+  "GR",
+  "IE",
+  "IT",
+  "LV",
+  "LT",
+  "LU",
+  "MT",
+  "NL",
+  "PT",
+  "SK",
+  "SI",
+  "ES",
+  "AD",
+  "MC",
+  "SM",
+  "VA",
+  "ME",
+  "XK",
+];
+
+const COUNTRY_CURRENCIES: Record<string, CurrencyCode> = {
+  US: "USD",
+  GB: "GBP",
+  NG: "NGN",
+  SA: "SAR",
+  AE: "AED",
+  QA: "QAR",
+  KW: "KWD",
+  EG: "EGP",
+  TR: "TRY",
+  PK: "PKR",
+  BD: "BDT",
+  MY: "MYR",
+  ID: "IDR",
+  IN: "INR",
+  CA: "CAD",
+  AU: "AUD",
+  ZA: "ZAR",
+  JO: "JOD",
+  MA: "MAD",
+  ...Object.fromEntries(EURO_COUNTRIES.map((country) => [country, "EUR"])),
+};
+
+// The currency for an ISO country code, or USD for countries we don't support
+export function currencyForCountry(country: string | undefined): CurrencyCode {
+  return (country && COUNTRY_CURRENCIES[country.toUpperCase()]) || "USD";
+}
+
 export function formatAmount(amount: number): string {
   return amount.toLocaleString("en-US", {
     minimumFractionDigits: 2,

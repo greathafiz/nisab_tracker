@@ -13,7 +13,7 @@ import React, {
  *
  * Provides:
  * - Multi-currency support (20+ currencies)
- * - Auto-detection based on browser locale e.g. en-GB, ar-SA, etc.
+ * - Auto-detection from the visitor's country (IP geolocation), USD otherwise
  * - Exchange rate management (updated every 24h)
  * - Hijri & Gregorian date display
  * - USD -> Target currency conversion utilities
@@ -22,7 +22,13 @@ import React, {
  * using cached exchange rates from exchangerate-api.com
  */
 
-import { currencies, type Currency, type CurrencyCode } from "@/lib/currencies";
+import {
+  COUNTRY_COOKIE,
+  currencies,
+  currencyForCountry,
+  type Currency,
+  type CurrencyCode,
+} from "@/lib/currencies";
 import {
   NISAB_STANDARDS,
   defaultStandardFor,
@@ -53,79 +59,19 @@ function subscribeToClock(onChange: () => void) {
   return () => clearInterval(interval);
 }
 
-// The browser locale doesn't change during a visit, so there's nothing to subscribe to
+// The country cookie doesn't change during a visit, so there's nothing to subscribe to
 function subscribeToNothing() {
   return () => {};
 }
 
+// The visitor's country comes from their IP (see proxy.ts), not the browser
+// locale, which is often en-GB or en-US wherever they actually live
 function detectUserCurrency(): CurrencyCode {
-  if (typeof window === "undefined") return "USD";
-
-  try {
-    const locale = navigator.language || "en-US";
-    const country = locale.split("-")[1]?.toUpperCase();
-
-    switch (country) {
-      // Gulf States
-      case "SA":
-        return "SAR";
-      case "AE":
-        return "AED";
-      case "QA":
-        return "QAR";
-      case "KW":
-        return "KWD";
-
-      // Major Muslim Countries
-      case "EG":
-        return "EGP";
-      case "TR":
-        return "TRY";
-      case "PK":
-        return "PKR";
-      case "BD":
-        return "BDT";
-
-      // ASEAN
-      case "MY":
-        return "MYR";
-      case "ID":
-        return "IDR";
-      case "IN":
-        return "INR";
-
-      // Europe
-      case "GB":
-        return "GBP";
-      case "DE":
-      case "FR":
-      case "IT":
-      case "ES":
-      case "NL":
-      case "AT":
-      case "BE":
-        return "EUR";
-
-      // Others
-      case "CA":
-        return "CAD";
-      case "AU":
-        return "AUD";
-      case "ZA":
-        return "ZAR";
-      case "JO":
-        return "JOD";
-      case "MA":
-        return "MAD";
-      case "NG":
-        return "NGN";
-
-      default:
-        return "USD";
-    }
-  } catch {
-    return "USD";
-  }
+  const country = document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith(`${COUNTRY_COOKIE}=`))
+    ?.slice(COUNTRY_COOKIE.length + 1);
+  return currencyForCountry(country);
 }
 
 // The visitor's chosen Nisab standard, remembered in localStorage across visits
@@ -186,7 +132,7 @@ async function fetchExchangeRates(): Promise<Record<string, number> | null> {
 }
 
 interface CurrencyDateContextType {
-  // The currency the visitor picked, or the one detected from their locale
+  // The currency the visitor picked, or the one detected from their country
   currency: Currency;
   setCurrency: (currency: CurrencyCode) => void;
   // The currency amounts are actually shown in: the selected one once its exchange
