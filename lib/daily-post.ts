@@ -76,13 +76,14 @@ export function telegramMessage(
   return [
     `🌙 <b>Today's Nisab, ${date}</b>`,
     "",
-    "Silver Nisab · Gold Nisab",
+    "🥈 Silver Nisab · 🥇 Gold Nisab",
     "",
     ...lines,
     "",
     `Based on ${majority.silverGrams} g of silver and ${majority.goldGrams} g of gold. * Hanafi tola weights: ${hanafi.silverGrams} g and ${hanafi.goldGrams} g.`,
     "",
-    `Gold prices by karat and a free Zakat calculator: ${escapeHtml(nisabPage("telegram"))}`,
+    // A short label instead of the long tracking URL
+    `Gold prices by karat and a free Zakat calculator: <a href="${escapeHtml(nisabPage("telegram"))}">nisabtracker.com/nisab</a>`,
   ].join("\n");
 }
 
