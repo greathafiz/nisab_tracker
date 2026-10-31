@@ -9,6 +9,7 @@ import { isOlderThan } from "@/lib/utils";
  * derive them with nisabAmounts() from lib/nisab-standards.ts.
  */
 export interface NisabValues {
+  // When the site last refreshed the prices
   lastUpdated: string;
   // True when prices haven't been refreshed for a while, i.e. the daily update is failing
   isStale: boolean;
@@ -32,7 +33,9 @@ export async function getNisabValues(): Promise<NisabValues | null> {
     const { goldPricePerGram, silverPricePerGram } = priceCache;
 
     return {
-      lastUpdated: priceCache.lastUpdated,
+      // When we fetched the prices, not the provider's stamp: metalpriceapi stamps its
+      // daily quote 23:59:59 the day before, which would date today's figures yesterday
+      lastUpdated: priceCache.fetchedAt ?? priceCache.lastUpdated,
       isStale: isOlderThan(
         priceCache.fetchedAt ?? priceCache.lastUpdated,
         STALE_AFTER_MS
