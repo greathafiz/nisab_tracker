@@ -42,8 +42,8 @@ export const metadata: Metadata = {
     site: "@nisabtracker",
     creator: "@hafizaderemi",
     title: "Nisab Tracker | Free Zakat Calculator",
+    // No images: X falls back to og:image, i.e. app/opengraph-image.tsx on the homepage
     description: "Nisab Tracker and Zakat Calculator",
-    images: ["/og-image.png"],
   },
   verification: { google: "UJhuIAMThdxkuHPVaUkmeN_c1QHDgtpqR2zMa7tAq1U" },
 };

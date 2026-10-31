@@ -7,6 +7,7 @@ import {
 } from "@/lib/nisab-standards";
 import { COUNTRIES, getCountry, countryInName } from "@/lib/countries";
 import { formatMoneyRounded } from "@/lib/currencies";
+import { OgBrand, logoDataUrl, ogFonts } from "@/lib/og";
 
 // Same schedule as the page, so the preview never shows older figures than the page
 export const revalidate = 3600;
@@ -32,9 +33,11 @@ export default async function Image({
 }) {
   const country = getCountry((await params).country)!;
   const inName = countryInName(country);
-  const [nisab, rates] = await Promise.all([
+  const [nisab, rates, fonts, logo] = await Promise.all([
     getNisabValuesForPage(),
     getExchangeRatesForPage(),
+    ogFonts(),
+    logoDataUrl(),
   ]);
   const rate = rates?.[country.currency];
 
@@ -56,7 +59,7 @@ export default async function Image({
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "28px 40px",
+        padding: "22px 40px",
         background: "white",
         borderRadius: 24,
         border: "2px solid #a7f3d0",
@@ -83,19 +86,17 @@ export default async function Image({
         flexDirection: "column",
         padding: "56px 64px",
         background: "linear-gradient(135deg, #fafaf9 0%, #ecfdf5 100%)",
-        fontFamily: "sans-serif",
+        fontFamily: "Geist",
       }}
     >
-      <div style={{ fontSize: 28, fontWeight: 700, color: EMERALD }}>
-        Nisab Tracker
-      </div>
+      <OgBrand logo={logo} size={48} />
       <div
         style={{
           fontSize: 64,
           fontWeight: 700,
           color: STONE_900,
-          marginTop: 12,
-          marginBottom: 36,
+          marginTop: 20,
+          marginBottom: 32,
         }}
       >
         {`Nisab in ${inName} today`}
@@ -132,6 +133,6 @@ export default async function Image({
         </div>
       </div>
     </div>,
-    size
+    { ...size, fonts }
   );
 }
